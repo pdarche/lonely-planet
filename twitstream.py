@@ -1,10 +1,12 @@
+import oauth.oauth as oauth
 import sys
 import getpass
 import itertools
 from optparse import OptionParser, OptionGroup
 from functools import partial
 from collections import defaultdict
-from twittornado import TwitterStreamGET, TwitterStreamPOST
+from twittornado import TwitterStreamGET, TwitterStreamOAuthPOST
+# from twittornado import TwitterStreamGET, TwitterStreamPOST
 
 USAGE = """%prog [options] method [params]
 
@@ -29,19 +31,19 @@ def constant_factory(value):
 BASEURL = defaultdict(constant_factory("https://stream.twitter.com/%s.json"))
 BASEURL['user'] = "https://chirpstream.twitter.com/%s.json"
 
-METHODPATH   = {
-                'firehose':   '1/statuses/firehose',
-                'gardenhose': '1/statuses/sample',
-                'spritzer':   '1/statuses/sample',
-                'birddog':    '1/statuses/filter',
-                'shadow':     '1/statuses/filter',
-                'follow':     '1/statuses/filter',
-                'track':      '1/statuses/filter',
-                'filter':     '1/statuses/filter',
-                'retweet':    '1/statuses/retweet',
-                'links':      '1/statuses/links',
-                'user':       '2b/user',
-                }
+METHODPATH = {
+        'firehose':   '1/statuses/firehose',
+        'gardenhose': '1/statuses/sample',
+        'spritzer':   '1/statuses/sample',
+        'birddog':    '1/statuses/filter',
+        'shadow':     '1/statuses/filter',
+        'follow':     '1/statuses/filter',
+        'track':      '1/statuses/filter',
+        'filter':     '1/statuses/filter',
+        'retweet':    '1/statuses/retweet',
+        'links':      '1/statuses/links',
+        'user':       '2b/user',
+    }
 
 def DEFAULTACTION(status):
     if "user" not in status:
@@ -67,7 +69,8 @@ def twitstream(method, user, pword, action, defaultdata=[], debug=False, engine=
 
     data = {POSTPARAMS[method]: ','.join(defaultdata)}
     data.update(kwargs)
-    return TwitterStreamPOST(user, pword, url, action, data, debug)
+    return TwitterStreamOAuthPOST(user, pword, url, action, data, debug)
+    # return TwitterStreamPOST(user, pword, url, action, data, debug)
      
 
 track = partial(twitstream, 'track')

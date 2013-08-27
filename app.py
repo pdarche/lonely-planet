@@ -31,6 +31,7 @@ else:
 twitstream.ensure_credentials(options)
 
 def testFunction(status):
+    print "testing"
     if "user" not in status:
         try:
             if options.debug:
@@ -38,7 +39,7 @@ def testFunction(status):
             return
         except:
             pass
-
+        print status
     if len(GLOBALS['sockets']) > 0:
         for socket in GLOBALS['sockets']:
             socket.write_message(status)            
@@ -56,8 +57,9 @@ class MainHandler(tornado.web.RequestHandler):
         self.set_header("Access-Control-Allow-Credentials", "true")
         self.set_header("Access-Control-Allow-Methods", "GET")        
 
-        token = self.get_secure_cookie('oauth_token')        
-        self.render( 'planet.html', authenticated=token ) 
+        # token = self.get_secure_cookie('oauth_token')
+        token = "yerp" 
+        self.render('planet.html', authenticated=token)
 
 
 class ClientSocket(websocket.WebSocketHandler):
@@ -91,8 +93,9 @@ class TwitterHandler(tornado.web.RequestHandler,
         self.authorize_redirect()
 
     def _on_auth(self, user):
-        if not user:
-            raise tornado.web.HTTPError(500, "Twitter auth failed")
+        # if not user:
+        #     raise tornado.web.HTTPError(500, "Twitter auth failed")
+        print "some stuuuffff"
 
         self.set_secure_cookie('user_id', str(user['id'])) 
         self.set_secure_cookie('oauth_token', user['access_token']['key']) 
@@ -118,7 +121,8 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
                 "/statuses/update",
                 post_args={"status": text},
                 access_token=accessToken,
-                callback=self.async_callback(self._on_post))
+                callback=self.async_callback(self._on_post)
+            )
 
     def _on_post(self, new_entry):
         if not new_entry:
@@ -133,7 +137,7 @@ stream = twitstream.twitstream(method, options.username, options.password, testF
 settings = dict(
     twitter_consumer_key='EGLC7uXFL0wNMygeZoZOTw',
     twitter_consumer_secret='pnvNerZKSBSw1kri5wjaM255CluYwd3OdaovUeyCsI',
-    cookie_secret='NTliOTY5NzJkYTVlMTU0OTAwMTdlNjgzMTA5M2U3OGQ5NDIxZmU3Mg==',
+    cookie_secret='7fTRXLknQeqxPQZxzBWTJOpJolSoHkVTgLgf6fDeUW0=',
     template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
     static_path=os.path.join(os.path.dirname(__file__), "static")          
 )

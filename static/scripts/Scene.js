@@ -51,7 +51,6 @@ var Scene = {
 
 		Scene.materialNormalMap = new THREE.ShaderMaterial( Scene.parameters );
 
-
 	},
 
 

@@ -1,3 +1,4 @@
+import oauth.oauth as oauth
 import socket
 import base64
 import urllib
@@ -15,6 +16,15 @@ import ssl
 # and the IOStream interface is very similar to asyncore/asynchat.
 
 USERAGENT = "twitstream.py (http://www.github.com/atl/twitstream), using tornado.iostream"
+CONSUMER_KEY="xWD4yOjKIewNQZA9RnqqPA"
+CONSUMER_SECRET="sViJYr85dwE1qqX0k0j8SwGdqBaR5I7lC0xkz2bmQ"
+ACCESS_KEY = "956317314-OD8jWwqCVTWbiE4Vik7DdPEyq2EiTslMuKziHFSH"
+ACCESS_SECRET = "GK6E2GiIGVRcWqoVoCnyJEFDMd1Xf4Yz7oQvidYx9nw" 
+RESOURCE_URL = 'https://stream.twitter.com/1/statuses/filter.json'
+
+def build_oauth_header(params):
+    return "OAuth " + ", ".join(
+            ['%s="%s"' % (k, v) for k, v in params.iteritems()]) #urllib.quote(v))
 
 class TwitterStreamGET(object):
     def __init__(self, user, pword, url, action, debug=False, preprocessor=json.loads):
@@ -40,7 +50,7 @@ class TwitterStreamGET(object):
     
     @property
     def request(self):
-        request  = 'GET %s HTTP/1.0\r\n' % self.url
+        request  = 'GET %s HTTP/1.1\r\n' % self.url
         request += 'Authorization: Basic %s\r\n' % self.authkey
         request += 'Accept: application/json\r\n'
         request += 'User-Agent: %s\r\n' % USERAGENT
@@ -61,10 +71,11 @@ class TwitterStreamGET(object):
             else:
                 a = data
             self.action(a)
+            print a
         if self.debug:
             print >> sys.stderr, data
         self.stream.read_until(self.terminator, self.found_terminator)
-        
+
     def run(self):
         self.stream.write(self.request)
         self.stream.read_until(self.terminator, self.found_terminator)
@@ -73,11 +84,12 @@ class TwitterStreamGET(object):
     def cleanup(self):
         self.stream.close()
 
+
 class TwitterStreamPOST(TwitterStreamGET):
     def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
         TwitterStreamGET.__init__(self, user, pword, url, action, debug, preprocessor)
         self.data = data
-    
+
     @property
     def request(self):
         data = urllib.urlencode(self.data)
@@ -89,4 +101,69 @@ class TwitterStreamPOST(TwitterStreamGET):
         request += 'Content-Length: %d\r\n' % len(data)
         request += '\r\n'
         request += '%s' % data
+        print "the request is %r" % request
         return request
+
+class TwitterStreamOAuthPOST(TwitterStreamGET):
+    def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
+        TwitterStreamGET.__init__(self, user, pword, url, action, debug, preprocessor)
+        self.data = data
+
+    @property
+    def request(self):
+        oauth_header = self.create_oauth_header()
+        data = urllib.urlencode(self.data)
+        request  = 'POST %s HTTP/1.1\r\n' % '/1/statuses/filter.json' #self.url
+        request += 'Accept: */*\r\n'
+        request += 'User-Agent: %s\r\n' % USERAGENT
+        request += 'Content-Type: application/x-www-form-urlencoded\r\n'
+        request += 'Authorization: %s\r\n' % oauth_header['Authorization']
+        request += 'Content-Length: %d\r\n' % len(data)
+        request += 'Host: stream.twitter.com \r\n'
+        request += '\r\n'
+        request += '%s' % data
+        return request
+
+    def create_oauth_header(self):
+        signature_method_hmac_sha1 = oauth.OAuthSignatureMethod_HMAC_SHA1()
+        consumer = oauth.OAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET)
+        token = DictObj()
+        token.key = ACCESS_KEY
+        token.secret = ACCESS_SECRET
+        parameters = self.data
+        oauth_request = oauth.OAuthRequest.from_consumer_and_token(
+                consumer,
+                token=token,
+                http_method='POST',
+                http_url=RESOURCE_URL,
+                parameters=parameters
+            )
+        print signature_method_hmac_sha1.build_signature_base_string(oauth_request, consumer, token)
+        oauth_request.sign_request(signature_method_hmac_sha1, consumer, token)
+        params = oauth_request.parameters
+
+        print to_header(oauth_request.parameters)['Authorization']
+        return to_header(oauth_request.parameters)
+
+def to_header(parameters, realm=''):
+    """
+    Serialize as a header for an HTTPAuth request.
+    """
+    # auth_header = 'OAuth realm="%s"' % realm
+    auth_header = 'OAuth '
+    param_list = parameters.keys()
+    param_list.sort()
+    # Add the oauth parameters.
+    if parameters:
+        for k in param_list:
+            if k[:6] == 'oauth_':
+                auth_header += '%s="%s", ' % (k, parameters[k])
+    return {'Authorization': auth_header[:-2]}
+
+class Struct:
+    def __init__(self, **entries): 
+        self.__dict__.update(entries)
+
+class DictObj(object):
+    def __getattr__(self, attr):
+        return self.__dict__.get(attr)        
