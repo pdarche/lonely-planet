@@ -18,8 +18,8 @@ import ssl
 USERAGENT = "twitstream.py (http://www.github.com/atl/twitstream), using tornado.iostream"
 CONSUMER_KEY="xWD4yOjKIewNQZA9RnqqPA"
 CONSUMER_SECRET="sViJYr85dwE1qqX0k0j8SwGdqBaR5I7lC0xkz2bmQ"
-ACCESS_KEY = "956317314-OD8jWwqCVTWbiE4Vik7DdPEyq2EiTslMuKziHFSH"
-ACCESS_SECRET = "GK6E2GiIGVRcWqoVoCnyJEFDMd1Xf4Yz7oQvidYx9nw" 
+ACCESS_KEY = "956317314-eIqms8Po5juezYhyYL7YEieig5Km2zCFmFWQk17n"
+ACCESS_SECRET = "1R2nBRAQbu35DLKqffiZYzTOqX3G5pvGMmcagtJk" 
 RESOURCE_URL = 'https://stream.twitter.com/1/statuses/filter.json'
 
 def build_oauth_header(params):
@@ -138,9 +138,8 @@ class TwitterStreamOAuthPOST(TwitterStreamGET):
                 http_url=RESOURCE_URL,
                 parameters=parameters
             )
-        print signature_method_hmac_sha1.build_signature_base_string(oauth_request, consumer, token)
+        # print signature_method_hmac_sha1.build_signature_base_string(oauth_request, consumer, token)
         oauth_request.sign_request(signature_method_hmac_sha1, consumer, token)
-        params = oauth_request.parameters
 
         print to_header(oauth_request.parameters)['Authorization']
         return to_header(oauth_request.parameters)
