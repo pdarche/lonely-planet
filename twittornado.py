@@ -1,10 +1,13 @@
 import oauth.oauth as oauth
+import oauth2
+import time
 import socket
 import base64
 import urllib
 import sys
 from urlparse import urlparse
 from tornado import iostream, ioloop
+from config import *
 try:
     import json
 except ImportError:
@@ -16,10 +19,6 @@ import ssl
 # and the IOStream interface is very similar to asyncore/asynchat.
 
 USERAGENT = "twitstream.py (http://www.github.com/atl/twitstream), using tornado.iostream"
-CONSUMER_KEY="xWD4yOjKIewNQZA9RnqqPA"
-CONSUMER_SECRET="sViJYr85dwE1qqX0k0j8SwGdqBaR5I7lC0xkz2bmQ"
-ACCESS_KEY = "956317314-eIqms8Po5juezYhyYL7YEieig5Km2zCFmFWQk17n"
-ACCESS_SECRET = "1R2nBRAQbu35DLKqffiZYzTOqX3G5pvGMmcagtJk" 
 RESOURCE_URL = 'https://stream.twitter.com/1/statuses/filter.json'
 
 def build_oauth_header(params):
@@ -71,7 +70,6 @@ class TwitterStreamGET(object):
             else:
                 a = data
             self.action(a)
-            print a
         if self.debug:
             print >> sys.stderr, data
         self.stream.read_until(self.terminator, self.found_terminator)
@@ -101,7 +99,6 @@ class TwitterStreamPOST(TwitterStreamGET):
         request += 'Content-Length: %d\r\n' % len(data)
         request += '\r\n'
         request += '%s' % data
-        print "the request is %r" % request
         return request
 
 class TwitterStreamOAuthPOST(TwitterStreamGET):
@@ -134,15 +131,54 @@ class TwitterStreamOAuthPOST(TwitterStreamGET):
         oauth_request = oauth.OAuthRequest.from_consumer_and_token(
                 consumer,
                 token=token,
-                http_method='POST',
+                http_method='GET',
                 http_url=RESOURCE_URL,
                 parameters=parameters
             )
-        # print signature_method_hmac_sha1.build_signature_base_string(oauth_request, consumer, token)
         oauth_request.sign_request(signature_method_hmac_sha1, consumer, token)
-
-        print to_header(oauth_request.parameters)['Authorization']
         return to_header(oauth_request.parameters)
+ 
+
+class TwitterStreamOAuth2POST(TwitterStreamGET):
+    def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
+        TwitterStreamGET.__init__(self, user, pword, url, action, debug, preprocessor)
+        self.data = data
+
+    @property
+    def request(self):
+        oauth_header = self.create_oauth_header(self.data)
+        data = urllib.urlencode(self.data)
+        request  = 'POST %s HTTP/1.1\r\n' % '/1/statuses/filter.json' #self.url
+        request += 'Accept: */*\r\n'
+        request += 'User-Agent: %s\r\n' % USERAGENT
+        request += 'Content-Type: application/x-www-form-urlencoded\r\n'
+        request += 'Authorization: %s\r\n' % str(oauth_header['Authorization'])
+        request += 'Content-Length: %d\r\n' % len(data)
+        request += 'Host: stream.twitter.com \r\n'
+        request += '\r\n'
+        request += '%s' % data
+        return request
+
+    def create_oauth_header(self, data):
+        consumer = oauth2.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
+        token = oauth2.Token(ACCESS_KEY, ACCESS_SECRET)
+
+        params = {
+            'oauth_version': "1.0",
+            'oauth_nonce': oauth2.generate_nonce(),
+            'oauth_timestamp': int(time.time()),
+            'oauth_token': token.key,
+            'oauth_consumer_key': consumer.key,
+            'track': data['track']
+        }
+
+        oauth_req = oauth2.Request(method="POST", url=RESOURCE_URL, parameters=params)
+        signature_method = oauth2.SignatureMethod_HMAC_SHA1()
+        oauth_req.sign_request(signature_method, consumer, token, include_body_hash=False)
+        headers = oauth_req.to_header() 
+        return headers
+
+
 
 def to_header(parameters, realm=''):
     """
@@ -159,9 +195,6 @@ def to_header(parameters, realm=''):
                 auth_header += '%s="%s", ' % (k, parameters[k])
     return {'Authorization': auth_header[:-2]}
 
-class Struct:
-    def __init__(self, **entries): 
-        self.__dict__.update(entries)
 
 class DictObj(object):
     def __getattr__(self, attr):

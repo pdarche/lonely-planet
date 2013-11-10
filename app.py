@@ -5,6 +5,7 @@ import tornado.httputil
 import tornado.auth
 import twitstream
 from tornado import websocket
+from config import *
 import os
 
 GLOBALS={
@@ -13,10 +14,6 @@ GLOBALS={
 }
 
 (options, args) = twitstream.parser.parse_args()
-
-options.engine = 'tornado'    
-options.username = 'lonely_tweet'
-options.password = 'so_ronely'
 
 twitUser = None 
 authenticated = False
@@ -28,10 +25,7 @@ else:
     if method not in twitstream.GETMETHODS and method not in twitstream.POSTPARAMS:
         raise NotImplementedError("Unknown method: %s" % method)
 
-twitstream.ensure_credentials(options)
-
 def testFunction(status):
-    print "testing"
     if "user" not in status:
         try:
             if options.debug:
@@ -43,7 +37,7 @@ def testFunction(status):
     if len(GLOBALS['sockets']) > 0:
         for socket in GLOBALS['sockets']:
             socket.write_message(status)            
-            # print "%s:\t%s\n" % (status.get('user', {}).get('screen_name'), status.get('text'))	
+            print "%s:\t%s\n" % (status.get('user', {}).get('screen_name'), status.get('text'))
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -57,8 +51,7 @@ class MainHandler(tornado.web.RequestHandler):
         self.set_header("Access-Control-Allow-Credentials", "true")
         self.set_header("Access-Control-Allow-Methods", "GET")        
 
-        # token = self.get_secure_cookie('oauth_token')
-        token = "yerp" 
+        token = self.get_secure_cookie('oauth_token')
         self.render('planet.html', authenticated=token)
 
 
@@ -95,8 +88,7 @@ class TwitterHandler(tornado.web.RequestHandler,
     def _on_auth(self, user):
         # if not user:
         #     raise tornado.web.HTTPError(500, "Twitter auth failed")
-        print "some stuuuffff"
-
+        print user
         self.set_secure_cookie('user_id', str(user['id'])) 
         self.set_secure_cookie('oauth_token', user['access_token']['key']) 
         self.set_secure_cookie('oauth_secret', user['access_token']['secret'])
@@ -135,9 +127,9 @@ stream = twitstream.twitstream(method, options.username, options.password, testF
             defaultdata=args[1:], debug=options.debug, engine=options.engine)   
 
 settings = dict(
-    twitter_consumer_key='EGLC7uXFL0wNMygeZoZOTw',
-    twitter_consumer_secret='pnvNerZKSBSw1kri5wjaM255CluYwd3OdaovUeyCsI',
-    cookie_secret='7fTRXLknQeqxPQZxzBWTJOpJolSoHkVTgLgf6fDeUW0=',
+    twitter_consumer_key=CONSUMER_KEY,
+    twitter_consumer_secret=CONSUMER_SECRET,
+    cookie_secret=COOKIE_SECRET,
     template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
     static_path=os.path.join(os.path.dirname(__file__), "static")          
 )

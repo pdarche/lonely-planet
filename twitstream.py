@@ -5,7 +5,7 @@ import itertools
 from optparse import OptionParser, OptionGroup
 from functools import partial
 from collections import defaultdict
-from twittornado import TwitterStreamGET, TwitterStreamOAuthPOST
+from twittornado import TwitterStreamGET, TwitterStreamOAuthPOST, TwitterStreamOAuth2POST
 # from twittornado import TwitterStreamGET, TwitterStreamPOST
 
 USAGE = """%prog [options] method [params]
@@ -53,7 +53,7 @@ def DEFAULTACTION(status):
             return
         except:
             pass
-    print "%s:\t%s\n" % (status.get('user', {}).get('screen_name'), status.get('text'))
+    # print "%s:\t%s\n" % (status.get('user', {}).get('screen_name'), status.get('text'))
 
 def twitstream(method, user, pword, action, defaultdata=[], debug=False, engine='async', **kwargs):
     '''General function to set up an asynchat object on twitter. Chooses GET or
@@ -69,9 +69,7 @@ def twitstream(method, user, pword, action, defaultdata=[], debug=False, engine=
 
     data = {POSTPARAMS[method]: ','.join(defaultdata)}
     data.update(kwargs)
-    return TwitterStreamOAuthPOST(user, pword, url, action, data, debug)
-    # return TwitterStreamPOST(user, pword, url, action, data, debug)
-     
+    return TwitterStreamOAuth2POST(user, pword, url, action, data, debug)
 
 track = partial(twitstream, 'track')
 
