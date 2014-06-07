@@ -5,8 +5,7 @@ import itertools
 from optparse import OptionParser, OptionGroup
 from functools import partial
 from collections import defaultdict
-from twittornado import TwitterStreamGET, TwitterStreamOAuthPOST, TwitterStreamOAuth2POST
-# from twittornado import TwitterStreamGET, TwitterStreamPOST
+from twittornado import TwitterStreamGET, TwitterStreamOAuth2POST
 
 USAGE = """%prog [options] method [params]
 
