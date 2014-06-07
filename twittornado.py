@@ -8,10 +8,11 @@ import sys
 from urlparse import urlparse
 from tornado import iostream, ioloop
 from config import *
-try:
-    import json
-except ImportError:
-    import simplejson as json
+# try:
+#     import json
+# except ImportError:
+#     import simplejson as json
+import json
 import ssl
 
 # Yes, this is very strongly based upon the twitasync approach.
@@ -61,15 +62,17 @@ class TwitterStreamGET(object):
         self.sock = ssl.wrap_socket(self.sock, do_handshake_on_connect=False)
         self.stream = iostream.SSLIOStream(self.sock)
     
-    def found_terminator(self, data):
+    def found_terminator(self, data):        
         if data.startswith("HTTP/1") and not data.endswith("200 OK\r\n"):
             print >> sys.stderr, data
-        if data.startswith('{'):
-            if self.preprocessor:
-                a = self.preprocessor(data)
-            else:
-                a = data
-            self.action(a)
+        if data.startswith('{'):            
+            # if self.preprocessor:
+            #     # a = self.preprocessor(data)
+            #     a = data
+            # else:
+            #     a = data
+            self.action(data)
+
         if self.debug:
             print >> sys.stderr, data
         self.stream.read_until(self.terminator, self.found_terminator)
@@ -148,7 +151,7 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
     def request(self):
         oauth_header = self.create_oauth_header(self.data)
         data = urllib.urlencode(self.data)
-        request  = 'POST %s HTTP/1.1\r\n' % '/1/statuses/filter.json' #self.url
+        request  = 'POST %s HTTP/1.1\r\n' % self.url
         request += 'Accept: */*\r\n'
         request += 'User-Agent: %s\r\n' % USERAGENT
         request += 'Content-Type: application/x-www-form-urlencoded\r\n'

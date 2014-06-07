@@ -7,6 +7,7 @@ import twitstream
 from tornado import websocket
 from config import *
 import os
+import json
 
 GLOBALS={
     'sockets': [],
@@ -22,22 +23,28 @@ if len(args) < 1:
     twitstream.parser.error("requires one method argument")
 else:
     method = args[0]
-    if method not in twitstream.GETMETHODS and method not in twitstream.POSTPARAMS:
+    if method not in twitstream.GETMETHODS and \
+            method not in twitstream.POSTPARAMS:
         raise NotImplementedError("Unknown method: %s" % method)
 
 def testFunction(status):
-    if "user" not in status:
-        try:
-            if options.debug:
-                print >> sys.stderr, status
-            return
-        except:
-            pass
-        print status
-    if len(GLOBALS['sockets']) > 0:
-        for socket in GLOBALS['sockets']:
-            socket.write_message(status)            
-            print "%s:\t%s\n" % (status.get('user', {}).get('screen_name'), status.get('text'))
+    try:
+        status = json.loads(status)
+        if len(GLOBALS['sockets']) > 0:
+            for socket in GLOBALS['sockets']:
+                socket.write_message(status)            
+                print "%s:\t%s\n" % (status.get('user', {})\
+                            .get('screen_name'), status.get('text'))
+    except:
+        print "error" 
+    # if "user" not in status:
+    #     try:
+    #         if options.debug:
+    #             print >> sys.stderr, status
+    #         return
+    #     except:
+    #         pass
+    #     print status
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -122,6 +129,7 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
             self.authorize_redirect()
             return
         self.finish("success")
+
 
 stream = twitstream.twitstream(method, options.username, options.password, testFunction, 
             defaultdata=args[1:], debug=options.debug, engine=options.engine)   
