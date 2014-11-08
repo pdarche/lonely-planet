@@ -20,7 +20,7 @@ twitUser = None
 authenticated = False
 
 if len(args) < 1:
-    twitstream.parser.error("requires one method argument")
+    args = ['track', 'lonely']
 else:
     method = args[0]
     if method not in twitstream.GETMETHODS and \
@@ -30,13 +30,14 @@ else:
 def testFunction(status):
     try:
         status = json.loads(status)
+        # todo: geocode the tweet
+        # todo: add the tweet to mongo
         if len(GLOBALS['sockets']) > 0:
             for socket in GLOBALS['sockets']:
                 socket.write_message(status)            
-                print "%s:\t%s\n" % (status.get('user', {})\
-                            .get('screen_name'), status.get('text'))
-    except:
-        print "error" 
+                # print "%s:\t%s\n" % (status.get('user', {})\
+                #             .get('screen_name'), status.get('text'))
+
     # if "user" not in status:
     #     try:
     #         if options.debug:
@@ -95,7 +96,6 @@ class TwitterHandler(tornado.web.RequestHandler,
     def _on_auth(self, user):
         if not user:
             raise tornado.web.HTTPError(500, "Twitter auth failed")
-        print user
         self.set_secure_cookie('user_id', str(user['id']))
         self.set_secure_cookie('oauth_token', user['access_token']['key'])
         self.set_secure_cookie('oauth_secret', user['access_token']['secret'])

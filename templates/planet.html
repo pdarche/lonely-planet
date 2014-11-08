@@ -2,20 +2,18 @@
 <html>
 	<head>
 		<title>Lonely Planet</title>
-
 		<!-- meta -->
 		<meta http-equiv="content-type" content="charset=utf-8" />
-
 		<!-- stylesheets -->
 		<link rel="stylesheet" type="text/css" href="static/styles/base.css" />
 		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
-
 		<!-- javascript --> 
-		<script charset="utf-8" src="static/scripts/vendor/geolocation.js"></script>	
-		
+		<script charset="utf-8" src="static/scripts/vendor/geolocation.js"></script>
 	</head>
 	<body>
-		<audio id="audio_player" autoplay="autoplay"><source src="static/media/mad_world.mp3" type="audio/mp3"></audio>
+		<audio id="audio_player" autoplay="autoplay">
+			<source src="static/media/mad_world.mp3" type="audio/mp3">
+		</audio>
 		<div id="three"></div>
 		<div id="nav" class="shown">
 			<h1>Lonely Planet</h1>
@@ -50,27 +48,25 @@
 			</div>
 		</div>
 		<div id="authenticated">{{ authenticated }}</div>
+		
 		<script charset="utf-8" src="static/scripts/vendor/jquery.js"></script>
 		<script charset="utf-8" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/skip.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/three.js"></script>
-		
+		<!-- shaders -->
 		<script charset="utf-8" src="static/scripts/vendor/shaders/CopyShader.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/shaders/FilmShader.js"></script>		
 		<script charset="utf-8" src="static/scripts/vendor/shaders/ShaderExtras.js"></script>
-		
+		<!-- controls -->
 		<script charset="utf-8" src="static/scripts/vendor/controls/FlyControls.js"></script>
-
+		<!-- postprocessing -->
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/EffectComposer.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/ShaderPass.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/MaskPass.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/shaderPass.js"></script>	
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/RenderPass.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/FilmPass.js"></script>
-		
-		<script charset="utf-8" src="static/scripts/vendor/typefaces/helvetiker_regular.typeface.js"></script>
-		<script charset="utf-8" src="static/scripts/vendor/typefaces/helvetiker_bold.typeface.js"></script>
-		
+		<!-- application -->
 		<script charset="utf-8" src="static/scripts/application.js"></script>
 		<script charset="utf-8" src="static/scripts/audio.js"></script>		
 	</body>

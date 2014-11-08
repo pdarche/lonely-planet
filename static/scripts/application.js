@@ -54,7 +54,7 @@
   var ws = new WebSocket("ws://localhost:9000/socket");
 
   // get user geolocation
-    GEO_LOCATION.getLocation(uAreHere, 12000);
+  GEO_LOCATION.getLocation(uAreHere, 12000);
 
   // setup
   init()
@@ -271,33 +271,6 @@ function uAreHere(x, y){
 
   group.add(userPin)
   // pins.push( userPin )
-
-  urh = new THREE.Mesh(
-      textGeo = new THREE.TextGeometry( "You are here", {
-
-        size: 12,
-        height: 2,
-        curveSegments: 2,
-
-        font: "helvetiker",
-        weight: "normal",
-        style: "normal",
-
-        bevelThickness: 2,
-        bevelSize: 1.5,
-        bevelEnabled: true,
-
-        material: 0,
-        extrudeMaterial: 1
-
-      }),
-    
-    new THREE.MeshBasicMaterial({ 
-      color: 0xFF00FF,
-      transparent : false,
-    })
-  )
-  scene.add( urh )
 }
 
 function onDocumentMouseMove( event ) {

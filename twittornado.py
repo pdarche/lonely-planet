@@ -8,10 +8,6 @@ import sys
 from urlparse import urlparse
 from tornado import iostream, ioloop
 from config import *
-# try:
-#     import json
-# except ImportError:
-#     import simplejson as json
 import json
 import ssl
 
@@ -66,12 +62,6 @@ class TwitterStreamGET(object):
         if data.startswith("HTTP/1") and not data.endswith("200 OK\r\n"):
             print >> sys.stderr, data
         if data.startswith('{'):
-            # REFACTOR: this needs to be cleaned up
-            # if self.preprocessor:
-            #     # a = self.preprocessor(data)
-            #     a = data
-            # else:
-            #     a = data
             self.action(data)
 
         if self.debug:
@@ -104,43 +94,6 @@ class TwitterStreamPOST(TwitterStreamGET):
         request += '\r\n'
         request += '%s' % data
         return request
-
-# class TwitterStreamOAuthPOST(TwitterStreamGET):
-#     def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
-#         TwitterStreamGET.__init__(self, user, pword, url, action, debug, preprocessor)
-#         self.data = data
-
-#     @property
-#     def request(self):
-#         oauth_header = self.create_oauth_header()
-#         data = urllib.urlencode(self.data)
-#         request  = 'POST %s HTTP/1.1\r\n' % '/1/statuses/filter.json' #self.url
-#         request += 'Accept: */*\r\n'
-#         request += 'User-Agent: %s\r\n' % USERAGENT
-#         request += 'Content-Type: application/x-www-form-urlencoded\r\n'
-#         request += 'Authorization: %s\r\n' % oauth_header['Authorization']
-#         request += 'Content-Length: %d\r\n' % len(data)
-#         request += 'Host: stream.twitter.com \r\n'
-#         request += '\r\n'
-#         request += '%s' % data
-#         return request
-
-#     def create_oauth_header(self):
-#         signature_method_hmac_sha1 = oauth.OAuthSignatureMethod_HMAC_SHA1()
-#         consumer = oauth.OAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET)
-#         token = DictObj()
-#         token.key = ACCESS_KEY
-#         token.secret = ACCESS_SECRET
-#         parameters = self.data
-#         oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-#                 consumer,
-#                 token=token,
-#                 http_method='GET',
-#                 http_url=RESOURCE_URL,
-#                 parameters=parameters
-#             )
-#         oauth_request.sign_request(signature_method_hmac_sha1, consumer, token)
-#         return to_header(oauth_request.parameters)
  
 
 class TwitterStreamOAuth2POST(TwitterStreamGET):
