@@ -1,8 +1,8 @@
 	var songPaths = [ 
-			"static/media/nothing_compares.mp3", "static/media/one_more_try.mp3", 
-			"static/media/miss_misery.mp3", "static/media/nutshell.mp3", 
-			"static/media/no_surprises.mp3", "static/media/hide_and_seek.mp3",
-			"static/media/i_know_its_over.mp3", "static/media/mad_world.mp3" 
+			"static/media/audio/nothing_compares.mp3", "static/media/one_more_try.mp3", 
+			"static/media/audio/miss_misery.mp3", "static/media/nutshell.mp3", 
+			"static/media/audio/no_surprises.mp3", "static/media/hide_and_seek.mp3",
+			"static/media/audio/i_know_its_over.mp3", "static/media/mad_world.mp3" 
 		],
 		songNames = [
 			"Sinead O'Connor - Nothing Compares", "George Michael - One More Try", 

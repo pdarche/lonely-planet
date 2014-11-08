@@ -21,31 +21,23 @@ authenticated = False
 
 if len(args) < 1:
     args = ['track', 'lonely']
+    method = 'track'
 else:
     method = args[0]
     if method not in twitstream.GETMETHODS and \
             method not in twitstream.POSTPARAMS:
         raise NotImplementedError("Unknown method: %s" % method)
 
-def testFunction(status):
+def tweet_callback(status):
     try:
         status = json.loads(status)
         # todo: geocode the tweet
         # todo: add the tweet to mongo
         if len(GLOBALS['sockets']) > 0:
             for socket in GLOBALS['sockets']:
-                socket.write_message(status)            
-                # print "%s:\t%s\n" % (status.get('user', {})\
-                #             .get('screen_name'), status.get('text'))
-
-    # if "user" not in status:
-    #     try:
-    #         if options.debug:
-    #             print >> sys.stderr, status
-    #         return
-    #     except:
-    #         pass
-    #     print status
+                socket.write_message(status)
+    except:
+        pass
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -131,7 +123,7 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
         self.finish("success")
 
 
-stream = twitstream.twitstream(method, options.username, options.password, testFunction, 
+stream = twitstream.twitstream(method, options.username, options.password, tweet_callback, 
             defaultdata=args[1:], debug=options.debug, engine=options.engine)   
 
 settings = dict(
@@ -143,7 +135,6 @@ settings = dict(
 )
 
 if __name__ == "__main__":
-
 	app = tornado.web.Application(
 		handlers = [
             (r"/", IndexHandler),
