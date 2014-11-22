@@ -203,7 +203,7 @@ function init(){
   atmosphere.receiveShadow = true
   atmosphere.castShadow = true  
 
-  glowscene.add( atmosphere ) 
+  glowscene.add( atmosphere )
 
   var renderModel = new THREE.RenderPass( scene, camera );
   var effectFilm = new THREE.FilmPass( 0.35, 0.75, 2048, false );
