@@ -2,15 +2,15 @@
 var app = app || {};
 
 var TweetsView =  Backbone.View.extend({
-	initialize: function() {
+  initialize: function() {
 
-	},
+  },
 
-	render: function() {
+  render: function() {
 
-	},
+  },
 
-	events: {
+  events: {
 
-	}
+  }
 });

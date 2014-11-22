@@ -2,6 +2,7 @@ var app = app || {};
 
 var PlanetView =  Backbone.View.extend({
   initialize: function(){
+    // NOTE: why are these all here.  This needs to be reviewed
     this.WIDTH = window.innerWidth;
     this.HEIGHT = window.innerHeight;
 
@@ -33,27 +34,30 @@ var PlanetView =  Backbone.View.extend({
     "document mousemove": mouseMove
   },
 
-  setupScene: function(){
+  setupScene: function() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
-                        this.VIEW_ANGLE, this.ASPECT, 
-                        this.NEAR, this.FAR);
+                      this.VIEW_ANGLE, this.ASPECT, 
+                      this.NEAR, this.FAR
+                    );
     this.camera.position.set(0, 0, 600);
     this.camera.lookAt(this.scene.position);
     this.scene.add(this.camera);
-  },
 
-  setupGlowScene: function(){
-    // add/configure glow scene
+  },
+  // configure and add the glow scene
+  setupGlowScene: function() {
     this.glowscene = new THREE.Scene();
     this.glowcamera = new THREE.PerspectiveCamera(
-                            this.VIEW_ANGLE, this.ASPECT, 
-                            this.NEAR, this.FAR);
+                          this.VIEW_ANGLE, this.ASPECT, 
+                          this.NEAR, this.FAR
+                        );
     this.glowcamera.position = this.camera.position;
-    this.glowscene.add(this.glowcamera)
+    this.glowscene.add(this.glowcamera);
+
   },
 
-  setupRenderer: function(){
+  setupRenderer: function() {
     // renderer stuff
     this.renderer = new THREE.WebGLRenderer({clearColor: 0x000000, clearAlpha: 1});
     this.renderer.setSize(this.WIDTH, this.HEIGHT);
@@ -63,16 +67,18 @@ var PlanetView =  Backbone.View.extend({
     // NOTE: this is going to change!! This will be the
     // el on the view
     $( '#three' ).append(this.renderer.domElement);
+
   },
 
   // NOTE: RENAME!
   setupScene2: function() {
     this.group = new THREE.Object3D()
-
+    // NOTE: refactor.  add base path
     this.planetTexture = THREE.ImageUtils.loadTexture( "static/media/final-images/earth_atmos.jpg" );
     this.cloudsTexture = THREE.ImageUtils.loadTexture( "static/media/final-images/earth_clouds.png");
     this.normalTexture = THREE.ImageUtils.loadTexture( "static/media/final-images/earth_normal.jpg" );
     this.specularTexture = THREE.ImageUtils.loadTexture( "static/media/final-images/earth_specular.jpg");
+
   },
 
   setupShaders: function() {
@@ -101,6 +107,7 @@ var PlanetView =  Backbone.View.extend({
     };
 
     this.materialNormalMap = new THREE.ShaderMaterial(parameters);
+
   },
 
   setupPrimarySceneElements: function() {
@@ -141,6 +148,7 @@ var PlanetView =  Backbone.View.extend({
     this.group.add(clouds);
 
     this.scene.add(this.group);
+
   },
 
   configureGlowScene: function(){
@@ -163,6 +171,7 @@ var PlanetView =  Backbone.View.extend({
     atmosphere.castShadow = true;
 
     this.glowscene.add(atmosphere);
+
   },
 
   setupFilmEffect: function(){
@@ -186,7 +195,8 @@ var PlanetView =  Backbone.View.extend({
     scene.add( plane );
 
     mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
-    ray = new THREE.Ray( camera.position, null );    
+    ray = new THREE.Ray( camera.position, null );
+
   },
 
   setupEffectComposer: function() {
@@ -198,9 +208,10 @@ var PlanetView =  Backbone.View.extend({
     composer = new THREE.EffectComposer( renderer );
     composer.addPass( renderModel );
     composer.addPass( effectFilm );
+
   },
 
-  //NOTE: not sure what this does!
+  //NOTE: what does this do?
   setupProjector: function() {
     var projector, plane;
 
