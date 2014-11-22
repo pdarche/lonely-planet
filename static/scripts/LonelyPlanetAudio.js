@@ -1,7 +1,7 @@
 var LonelyPlanetAudio = {
 	songIndex : -1,
 	audioPlayer : $('#audio_player'),
-	baseUrl : "static/media/",
+	baseUrl : "static/media/audio/",
 	songs : [
 		{ name: "Gary Jules - Mad World", path: this.baseUrl + "mad_world.mp3"},
 		{ name: "Sinead O'Connor - Nothing Compares", path: this.baseUrl + "nothing_compares.mp3" }
