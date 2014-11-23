@@ -19,8 +19,8 @@ var PlanetView =  Backbone.View.extend({
     this.FAR = 10000;
 
     //bind resize, mousemove
-    _.bind(this.resize, window, 'onresize');
-    _.bind(this.mouseMove, document, 'mousemove');
+    $(window).resize(this.resize);
+    // $(document).mousemove(this.mouseMove);
     //
     $.proxy(this.setupScene(), this);
     $.proxy(this.setupGlowScene(), this);
