@@ -17,10 +17,7 @@ var PlanetView =  Backbone.View.extend({
     this.ASPECT = this.WIDTH / this.HEIGHT;
     this.NEAR = 0.1;
     this.FAR = 10000;
-
-    //bind resize, mousemove
-    $(window).resize(this.resize);
-    // $(document).mousemove(this.mouseMove);
+    
     //
     $.proxy(this.setupScene(), this);
     $.proxy(this.setupGlowScene(), this);
@@ -34,7 +31,12 @@ var PlanetView =  Backbone.View.extend({
     //
     $.proxy(this.addLights(), this);
     $.proxy(this.addStars(), this);
+    $.proxy(this.addControls(), this);
     $.proxy(this.loop(), this);
+
+    //bind resize, mousemove
+    $(window).resize($.proxy(this.resize, this));
+    $(document).mousemove($.proxy(this.mouseMove, this));
 
   },
 
@@ -223,7 +225,7 @@ var PlanetView =  Backbone.View.extend({
   setupProjector: function() {
     var projector, plane;
 
-    projector = new THREE.Projector();
+    this.projector = new THREE.Projector();
     plane = new THREE.Mesh(
               new THREE.PlaneGeometry(1000, 1000), 
               new THREE.MeshBasicMaterial()
@@ -313,6 +315,23 @@ var PlanetView =  Backbone.View.extend({
     }
 
   },
+  //NOTE: figure out which of these are needed
+  addControls: function() {
+    window.controls = new THREE.TrackballControls(this.camera);
+
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    controls.noZoom = false;
+    controls.noPan  = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+    controls.keys = [ 65, 83, 68 ];
+
+    controls.addEventListener('change', this.render);
+
+  },
 
   resize: function() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -321,8 +340,23 @@ var PlanetView =  Backbone.View.extend({
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   },
 
-  mouseMove: function() {
+  //NOTE: this will likely
+  mouseMove: function(ev) {
+    ev.preventDefault();
+    mouse2D.x = (ev.clientX / window.innerWidth) * 2 - 1;
+    mouse2D.y = -(ev.clientY / window.innerHeight) * 2 + 1;
 
+    mouse3D = this.projector.unprojectVector(mouse2D.clone(), this.camera);
+    ray.direction = mouse3D.subSelf(this.camera.position).normalize();
+
+    var intersects = ray.intersectObjects(this.scene.children);
+
+    // mouseover stuff to see if the mose is intersecting a tweet
+    if (intersects.length > 0) {
+      // if ( ROLLOVERED ) ROLLOVERED.color.setHex( 0x00ff80 );
+      ROLLOVERED = intersects;
+      // console.log( intersects )
+    }
   }
 
 });
