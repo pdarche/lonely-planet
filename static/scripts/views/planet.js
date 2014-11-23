@@ -2,7 +2,7 @@ var app = app || {};
 
 var PlanetView =  Backbone.View.extend({
   initialize: function(){
-    // NOTE: why are these all here.  This needs to be reviewed
+    // NOTE: review to see which of these are used!
     this.WIDTH = window.innerWidth;
     this.HEIGHT = window.innerHeight;
     this.tilt = 0.41;
@@ -18,7 +18,7 @@ var PlanetView =  Backbone.View.extend({
     this.NEAR = 0.1;
     this.FAR = 10000;
     
-    //
+    // setup the scene
     $.proxy(this.setupScene(), this);
     $.proxy(this.setupGlowScene(), this);
     $.proxy(this.setupRenderer(), this);
@@ -28,15 +28,19 @@ var PlanetView =  Backbone.View.extend({
     $.proxy(this.configureGlowScene(), this);
     $.proxy(this.setupFilmEffect(), this);
     $.proxy(this.setupProjector(), this);
-    //
+    
+    // add the scene elements and start rendering
     $.proxy(this.addLights(), this);
     $.proxy(this.addStars(), this);
     $.proxy(this.addControls(), this);
     $.proxy(this.loop(), this);
 
-    //bind resize, mousemove
+    //bind resize, mousemove events
     $(window).resize($.proxy(this.resize, this));
     $(document).mousemove($.proxy(this.mouseMove, this));
+
+    // bind new tweet event to the collection
+    this.collection.bind('add', $.proxy(this.newTweet, this));
 
   },
 
@@ -62,8 +66,12 @@ var PlanetView =  Backbone.View.extend({
 
     requestAnimationFrame($.proxy(this.loop, this));
     this.render();
-    // this.controls.update();
-  },  
+    // controls.update();
+  },
+
+  newTweet: function(ev){
+    console.log('getting new tweet', this.collection.last());
+  },
 
   "events": {
 
@@ -75,7 +83,7 @@ var PlanetView =  Backbone.View.extend({
                       this.VIEW_ANGLE, this.ASPECT, 
                       this.NEAR, this.FAR
                     );
-    this.camera.position.set(0, 0, 600);
+    this.camera.position.set(0, 0, 1200);
     this.camera.lookAt(this.scene.position);
     this.scene.add(this.camera);
 
@@ -99,7 +107,6 @@ var PlanetView =  Backbone.View.extend({
     this.renderer.sortObjects = false;
     this.renderer.autoClear = false;
 
-    console.log('testing');
     this.$el.append(this.renderer.domElement);
 
   },
