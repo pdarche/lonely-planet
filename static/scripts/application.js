@@ -760,7 +760,7 @@ function loop(){
   //  https://developer.mozilla.org/en-US/docs/DOM/window.requestAnimationFrame
   
   requestAnimationFrame( loop )
-  render()
+  this.render()
   controls.update()
 }
 
