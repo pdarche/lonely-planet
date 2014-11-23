@@ -12,13 +12,15 @@
 	</head>
 	<body>
 		<audio id="audio_player" autoplay="autoplay">
-			<source src="static/media/mad_world.mp3" type="audio/mp3">
+			<source src="static/media/audio/mad_world.mp3" type="audio/mp3">
 		</audio>
 		<div id="three"></div>
+
 		<div id="nav" class="shown">
 			<h1>Lonely Planet</h1>
 			<div id="tweets"></div>
 		</div>
+
 		<div id="control_panel" class="hidden">
 			<div id="flag"></div>
 			<div id="controls">
@@ -53,6 +55,8 @@
 		<script charset="utf-8" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/skip.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/three.js"></script>
+		<script charset="utf-8" src="static/scripts/vendor/underscore.min.js"></script>
+		<script charset="utf-8" src="static/scripts/vendor/backbone.min.js"></script>
 		<!-- shaders -->
 		<script charset="utf-8" src="static/scripts/vendor/shaders/CopyShader.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/shaders/FilmShader.js"></script>		
@@ -67,10 +71,7 @@
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/RenderPass.js"></script>
 		<script charset="utf-8" src="static/scripts/vendor/postprocessing/FilmPass.js"></script>
 		<!-- application -->
-		<script charset="utf-8" src="static/scripts/vendor/underscore.min.js"></script>
-		<script charset="utf-8" src="static/scripts/vendor/backbone.min.js"></script>
 		<script charset="utf-8" src="static/scripts/views/planet.js"></script>
-		<!-- <script charset="utf-8" src="static/scripts/application.js"></script> -->
 		<script charset="utf-8" src="static/scripts/app.js"></script>
 		<script charset="utf-8" src="static/scripts/audio.js"></script>
 	</body>
