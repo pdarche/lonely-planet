@@ -3,6 +3,7 @@ var app = app || {};
 var PlanetView =  Backbone.View.extend({
   initialize: function(){
     // NOTE: review to see which of these are used!
+    this.pins = [];
     this.WIDTH = window.innerWidth;
     this.HEIGHT = window.innerHeight;
     this.tilt = 0.41;
@@ -56,6 +57,8 @@ var PlanetView =  Backbone.View.extend({
   },
 
   loop: function() {
+    var self = this;
+
     this.group.rotation.y += (0.02).degreesToRadians();
     this.clouds.rotation.y += (0.01).degreesToRadians();
 
@@ -64,13 +67,36 @@ var PlanetView =  Backbone.View.extend({
       this.camera.position.y += .3;
     }
 
+    if (this.pins.length > 0) {
+      $.each(this.pins, function(i){
+        if (self.pins[i].dead){
+          // this.pins[i].children[0].children[1].visible = false;
+          // scene.remove(scene.__objects[i + 2]);
+          // delete pins[i].children[0].children[1];
+          // renderer.deallocateObject(pins[i].children[0].children[1]);
+        } else {
+          self.pins[i].fadeMarker();
+          self.pins[i].fadeIndicator();
+          self.pins[i].spike();
+        }
+      });
+    }
+
     requestAnimationFrame($.proxy(this.loop, this));
     this.render();
     // controls.update();
   },
 
-  newTweet: function(ev){
-    console.log('getting new tweet', this.collection.last());
+  newTweet: function(ev){    
+    var lat = getRandomInRange(-180, 180, 3)
+      , lon = getRandomInRange(-180, 180, 3)
+      , tweet = this.collection.last()
+      , pin = this.dropPin(lat, lon, 0xFFFFFF, tweet);
+      
+      console.log('getting new tweet', tweet);
+      
+      this.group.add(pin);
+      this.pins.unshift(pin);
   },
 
   "events": {
@@ -83,7 +109,7 @@ var PlanetView =  Backbone.View.extend({
                       this.VIEW_ANGLE, this.ASPECT, 
                       this.NEAR, this.FAR
                     );
-    this.camera.position.set(0, 0, 1200);
+    this.camera.position.set(0, 0, 280);
     this.camera.lookAt(this.scene.position);
     this.scene.add(this.camera);
 
@@ -125,7 +151,7 @@ var PlanetView =  Backbone.View.extend({
 
   setupShaders: function() {
     var shader = THREE.ShaderUtils.lib[ "normal" ]
-      , uniforms = THREE.UniformsUtils.clone( shader.uniforms )
+      , uniforms = THREE.UniformsUtils.clone(shader.uniforms)
       , parameters;
 
     uniforms[ "tNormal" ].value = this.normalTexture;
@@ -155,9 +181,9 @@ var PlanetView =  Backbone.View.extend({
   setupPrimarySceneElements: function() {
     var earthRadius, earth, clouds;
 
-    earthRadius = 90;
+    this.earthRadius = 90;
     earth = new THREE.Mesh(
-      new THREE.SphereGeometry(earthRadius, 64, 64),
+      new THREE.SphereGeometry(this.earthRadius, 64, 64),
       new THREE.MeshPhongMaterial({ 
         map: this.planetTexture,  //THREE.ImageUtils.loadTexture( 'static/media/good-earth/small-map.jpg' ), 
         transparency: true, 
@@ -177,7 +203,7 @@ var PlanetView =  Backbone.View.extend({
     this.group.add(earth);
 
     this.clouds = new THREE.Mesh(
-      new THREE.SphereGeometry(earthRadius + 2, 32, 32),
+      new THREE.SphereGeometry(this.earthRadius + 2, 32, 32),
       new THREE.MeshLambertMaterial({ 
         color: 0xffffff,
         map: this.cloudsTexture, //THREE.ImageUtils.loadTexture( 'static/media/good-earth/small-clouds.png' ),
@@ -364,6 +390,71 @@ var PlanetView =  Backbone.View.extend({
       ROLLOVERED = intersects;
       // console.log( intersects )
     }
-  }
+  },
+
+  dropPin: function(latitude, longitude, color, tweet) {
+    var group1, group2, marker, markerLength, indicator;
+
+    group1 = new THREE.Object3D();
+    group2 = new THREE.Object3D();
+    markerLength = 10
+    marker = new THREE.Mesh(
+      new THREE.CylinderGeometry(.05, .25, 15, false),
+      new THREE.MeshBasicMaterial({ 
+        color: color,
+        transparent : true,
+      })
+    );
+    indicator = new THREE.Mesh(
+      new THREE.CylinderGeometry( .5, .5, 4, 25, false ),
+      new THREE.MeshBasicMaterial({ 
+        color: color,
+        transparent : true,
+      })
+    );
+
+    indicator.position.y = this.earthRadius
+    marker.position.y = this.earthRadius
+
+    // why is group 1 added twice?
+    group1.add(indicator);
+    group2.add(group1);
+    group1.add(marker);
+    group1.rotation.x = ( 90 - latitude  ).degreesToRadians();
+    group2.add(group1);
+    group2.rotation.y = ( 90 + longitude ).degreesToRadians();
+
+    group2.tweet = tweet;
+    group2.geo = {lat : latitude, lon : longitude};
+    group2.dead = false;
+
+    group2.fadeMarker = function(){
+      if (this.children[0].children[1].material.opacity > 0){
+        this.children[0].children[1].material.opacity -= .01
+      } else {
+        this.dead = true;
+      }
+    }
+
+    group2.fadeIndicator = function(){
+      if (this.children[0].children[0].material.opacity > .5){
+        this.children[0].children[0].material.opacity -= .03
+      }
+    } 
+
+    group2.spike = function(){
+      if (this.children[0].children[1].scale.y < 3 && !this.dead) {
+        this.children[0].children[1].scale.y += .8
+        // console.log(this.children[1].children[1].scale.y)
+      }
+    }
+
+    return group2
+  }  
 
 });
+
+
+function getRandomInRange(from, to, fixed) {
+  return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
+}
