@@ -497,7 +497,7 @@ function attachTweet(tweet, translatedText, location){
 //  and another for rotating on longitude. Otherwise we'd just be rotating our
 //  marker shape rather than rotating it relative to the Earth.
 
-function dropPin( latitude, longitude, color, tweet ){
+function dropPin(latitude, longitude, color, tweet){
 
   var 
   group1 = new THREE.Object3D(),

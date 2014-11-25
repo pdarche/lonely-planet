@@ -1,0 +1,19 @@
+<script type="x-handlebars-template">
+	<div class="tweet" id="{{tweet.id_str}}">
+		<div class="img">
+			<img src="{{tweet.user.profile_image_url}}"/>
+		</div>
+		<div class="tweet-wrapper">
+			<div class="user-name">
+				<a href="http://twitter.com/{{tweet.user.screen_name}}" Target="_blank"> {{tweet.user.name}} </a>
+				<span class="location"> {{location}} </span>
+			</div>
+			<div class="followers">followers: {{tweet.user.followers_count}} </div>
+			<div class="tweet-text"> {{tweet.text}} </div>
+		</div>
+		<div class="reply">
+			<textarea cols="40" rows="6" class="reply-input" placeholder="reply to @{{tweet.user.screen_name}}"></textarea>
+			<button class="reply-button">tweet</button>
+		</div>
+	</div>
+</script>

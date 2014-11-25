@@ -20,7 +20,7 @@ twitUser = None
 authenticated = False
 
 if len(args) < 1:
-    args = ['track', 'Ferguson']
+    args = ['track', 'Lonely']
     method = 'track'
 else:
     method = args[0]

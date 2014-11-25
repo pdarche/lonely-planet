@@ -2,6 +2,7 @@ var app = app || {};
 
 var PlanetView =  Backbone.View.extend({
   initialize: function(){
+    var self = this;
     // NOTE: review to see which of these are used!
     this.pins = [];
     this.WIDTH = window.innerWidth;
@@ -40,6 +41,11 @@ var PlanetView =  Backbone.View.extend({
     $(window).resize($.proxy(this.resize, this));
     $(document).mousemove($.proxy(this.mouseMove, this));
 
+    $.when($.get('/static/scripts/templates/tweet.Handlebars'))
+     .done(function(tmpl){
+      console.log('the template is', tmpl);
+      self.tmpl = tmpl;
+     })
     // bind new tweet event to the collection
     this.collection.bind('add', $.proxy(this.newTweet, this));
 
@@ -87,6 +93,15 @@ var PlanetView =  Backbone.View.extend({
     // controls.update();
   },
 
+  renderTweet: function(tweet){
+    var source = $(this.tmpl).html()
+      , tmpl   = Handlebars.compile(source)
+      , html   = tmpl({"tweet":tweet.toJSON()});
+
+    $('#tweets').prepend(html);
+
+  },
+
   newTweet: function(ev){    
     var lat = getRandomInRange(-180, 180, 3)
       , lon = getRandomInRange(-180, 180, 3)
@@ -94,7 +109,7 @@ var PlanetView =  Backbone.View.extend({
       , pin = this.dropPin(lat, lon, 0xFFFFFF, tweet);
       
       console.log('getting new tweet', tweet);
-      
+      $.proxy(this.renderTweet(tweet), this);
       this.group.add(pin);
       this.pins.unshift(pin);
   },
