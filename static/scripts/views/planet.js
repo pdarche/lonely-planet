@@ -108,10 +108,9 @@ var PlanetView =  Backbone.View.extend({
       , tweet = this.collection.last()
       , pin = this.dropPin(lat, lon, 0xFFFFFF, tweet);
       
-      console.log('getting new tweet', tweet);
-      $.proxy(this.renderTweet(tweet), this);
-      this.group.add(pin);
-      this.pins.unshift(pin);
+    $.proxy(this.renderTweet(tweet), this);
+    this.group.add(pin);
+    this.pins.unshift(pin);
   },
 
   "events": {

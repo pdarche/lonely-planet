@@ -3,7 +3,7 @@ var app = app || {};
 
 var TweetsView =  Backbone.View.extend({
   initialize: function() {
-    // fetch and cache the tweet template
+  // fetch and cache the tweet template
 
   },
 

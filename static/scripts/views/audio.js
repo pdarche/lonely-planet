@@ -3,6 +3,7 @@ var app = app || {};
 
 var AudioView =  Backbone.View.extend({
   initialize: function() {
+  // fetch and cache the audio template
 
   },
 
