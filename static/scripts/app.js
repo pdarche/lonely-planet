@@ -20,6 +20,10 @@ $(document).ready(function(){
   tweetsView = new TweetsView({
     el: '#tweets',
     collection: tweetsCollection
+  });
+
+  auidoView = new AudioView({
+    el: '#control_panel'
   })
   // on message, create a new tweetModel
   // and add it tweet to the collection

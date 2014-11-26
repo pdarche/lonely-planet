@@ -4,7 +4,7 @@ var app = app || {};
 var TweetsView = Backbone.View.extend({
   initialize: function() {
     var self = this;
-  // fetch and cache the tweet template
+    // fetch and cache the tweet template
     $.when($.get('/static/scripts/templates/tweet.Handlebars'))
      .done(function(tmpl){
       self.tmpl = tmpl;

@@ -1,0 +1,31 @@
+<script type="x-handlebars-template">	
+	<audio id="audio_player">
+		<source src="static/media/audio/mad_world.mp3" type="audio/mp3">
+	</audio>
+	<div id="flag"></div>
+	<div id="controls">
+		<div id="control_title">Controls</div>
+		<div id="control_wrapper">
+			<div class="option-wrapper">
+				<div class="option-type visibility">Tweets</div>
+				<div id="show_tweets" class="option-one option active">Show</div>
+				<div id="hide_tweets" class="option-two option">Hide</div>
+			</div>
+			<div class="option-wrapper">
+				<div class="option-type audio" id="music">Music</div>	
+				<div class="audio-control active-audio extra-margin" id="play">play</div>
+				<div class="audio-control" id="pause">pause</div>
+				<div class="audio-control extra-margin" id="forward">next</div>
+				<div class="audio-control" id="back">previous</div>
+				<div id="song_name">Gary Jules - Mad World</div>
+			</div> 
+			<div class="option-wrapper">
+				<div class="option-type">Follower Count</div>
+				<div id="slider_wrapper">
+					<div id="slider_pos">1000</div>
+					<div class="slider" id="follower_count_slider"></div>
+				</div>
+			</div>
+		</div> 
+	</div>
+</script>
