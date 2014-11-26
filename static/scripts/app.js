@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  var  tweetsView
+  var tweetsView
     , planetView, auidoView
     , controlsView, socket;
   //tweetsCollection,
@@ -17,7 +17,10 @@ $(document).ready(function(){
   });
 
   // tweetsView
-
+  tweetsView = new TweetsView({
+    el: '#tweets',
+    collection: tweetsCollection
+  })
   // on message, create a new tweetModel
   // and add it tweet to the collection
   socket.onmessage = function(ev){
