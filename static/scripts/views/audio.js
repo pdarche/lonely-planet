@@ -10,14 +10,14 @@ var AudioView =  Backbone.View.extend({
       "miss_misery.mp3", "nutshell.mp3", 
       "no_surprises.mp3", "hide_and_seek.mp3",
       "i_know_its_over.mp3", "mad_world.mp3" 
-    ]
+    ];
     this.songNames = [
       "Sinead O'Connor - Nothing Compares", "George Michael - One More Try", 
       "Elliot Smith - Miss Misery", "Alice In Chains - Nutshell",
       "Radiohead - No Surprises", "Imogen Heap - Hide and Seek",
       "The Smiths - I Know It's Over", "Gary Jules - Mad World" 
-    ]
-    this.songIndex = 0
+    ];
+    this.songIndex = 0;
     this.basePath = "static/media/audio/";
     // load and render the template
     $.when($.get('/static/scripts/templates/audioControls.Handlebars'))
@@ -55,6 +55,7 @@ var AudioView =  Backbone.View.extend({
   toggleActiveAudio: function(ev){
     $('.active-audio').removeClass('active-audio');
     $(ev.target).addClass('active-audio');
+    
   },
   
   play : function(){
@@ -71,7 +72,7 @@ var AudioView =  Backbone.View.extend({
     console.log('the song index is', this.basePath + this.songPaths[this.songIndex]);
     this.audioPlayer.src = this.basePath + this.songPaths[this.songIndex]
     this.audioPlayer.play();
-    
+
   },
 
   back: function(){
