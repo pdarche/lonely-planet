@@ -22,6 +22,7 @@ $(document).ready(function(){
     collection: tweetsCollection
   });
 
+  // controls view
   auidoView = new AudioView({
     el: '#control_panel'
   });
