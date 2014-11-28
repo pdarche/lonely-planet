@@ -62,7 +62,7 @@ var PlanetView = Backbone.View.extend({
     this.group.rotation.y += (0.02).degreesToRadians();
     this.clouds.rotation.y += (0.01).degreesToRadians();
 
-    if (this.camera.position.z > 240){ //&& userPin !== undefined){
+    if (this.camera.position.z > 600){ //&& userPin !== undefined){
       this.camera.position.z -= 1;
       this.camera.position.y += .3;
     }

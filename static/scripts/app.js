@@ -24,7 +24,7 @@ $(document).ready(function(){
 
   auidoView = new AudioView({
     el: '#control_panel'
-  })
+  });
   // on message, create a new tweetModel
   // and add it tweet to the collection
   socket.onmessage = function(ev){
@@ -35,4 +35,4 @@ $(document).ready(function(){
   }
   
   socket.onmessage();
-})
+});
