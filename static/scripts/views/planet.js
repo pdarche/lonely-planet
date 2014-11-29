@@ -98,7 +98,7 @@ var PlanetView = Backbone.View.extend({
 
     requestAnimationFrame($.proxy(this.loop, this));
     this.render();
-    // controls.update();
+    this.controls.update();
   },
 
   updateTween: function(){
@@ -381,19 +381,19 @@ var PlanetView = Backbone.View.extend({
   },
   //NOTE: figure out which of these are needed
   addControls: function() {
-    window.controls = new THREE.TrackballControls(this.camera);
+    this.controls = new THREE.TrackballControls(this.camera);
 
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
+    this.controls.rotateSpeed = 1.0;
+    this.controls.zoomSpeed = 1.2;
+    this.controls.panSpeed = 0.8;
 
-    controls.noZoom = false;
-    controls.noPan  = false;
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3;
-    controls.keys = [ 65, 83, 68 ];
+    this.controls.noZoom = false;
+    this.controls.noPan  = false;
+    this.controls.staticMoving = true;
+    this.controls.dynamicDampingFactor = 0.3;
+    this.controls.keys = [65, 83, 68];
 
-    controls.addEventListener('change', this.render);
+    this.controls.addEventListener('change', $.proxy(this.render, this));
 
   },
 
