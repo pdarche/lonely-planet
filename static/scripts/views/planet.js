@@ -22,7 +22,7 @@ var PlanetView = Backbone.View.extend({
     this.position = {x: 0, y: 0, z: 1200};
     this.target = {x: 0, y: 200, z: 250};
     this.tween = new TWEEN.Tween(this.position)
-                            .to(this.target, 4000);
+                            .to(this.target, 8000);
 
     // setup the scene
     $.proxy(this.setupScene(), this);
@@ -34,16 +34,8 @@ var PlanetView = Backbone.View.extend({
     $.proxy(this.configureGlowScene(), this);
     $.proxy(this.setupFilmEffect(), this);
     $.proxy(this.setupProjector(), this);
-
     // setup the camera tween
-    this.tween.onUpdate(function(){
-      self.camera.position.z = self.position.z;
-      self.camera.position.y = self.position.y;
-    });
-    this.tween.delay(1000);
-    this.tween.easing(TWEEN.Easing.Quadratic.InOut);
-    this.tween.start();
-    
+    $.proxy(this.setupTween(), this);
     // add the scene elements and start rendering
     $.proxy(this.addLights(), this);
     $.proxy(this.addStars(), this);
@@ -117,6 +109,18 @@ var PlanetView = Backbone.View.extend({
 
   "events": {
 
+  },
+
+  setupTween: function(){
+    var self = this; 
+
+    this.tween.onUpdate(function(){
+      self.camera.position.z = self.position.z;
+      self.camera.position.y = self.position.y;
+    });
+    this.tween.delay(1000);
+    this.tween.easing(TWEEN.Easing.Quadratic.InOut);
+    this.tween.start();
   },
 
   setupScene: function() {    
