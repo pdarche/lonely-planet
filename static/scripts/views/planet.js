@@ -34,6 +34,8 @@ var PlanetView = Backbone.View.extend({
     $.proxy(this.configureGlowScene(), this);
     $.proxy(this.setupFilmEffect(), this);
     $.proxy(this.setupProjector(), this);
+    // get the user's location
+    GEO_LOCATION.getLocation($.proxy(this.uAreHere, this), 12000);
     // setup the camera tween
     $.proxy(this.setupTween(), this);
     // add the scene elements and start rendering
@@ -48,6 +50,15 @@ var PlanetView = Backbone.View.extend({
 
     // bind new tweet event to the collection
     this.collection.bind('add', $.proxy(this.newTweet, this));
+
+  },
+
+  uAreHere: function(x, y){
+    var userPin = this.dropPin(Number(x), Number(y), 0xFFFFFF)
+      , lat = (90 - Number(x)).degreesToRadians()
+      , lon = (90 + Number(y)).degreesToRadians();
+
+    this.group.add(userPin);
 
   },
 
@@ -112,7 +123,7 @@ var PlanetView = Backbone.View.extend({
   },
 
   setupTween: function(){
-    var self = this; 
+    var self = this;
 
     this.tween.onUpdate(function(){
       self.camera.position.z = self.position.z;

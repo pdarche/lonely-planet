@@ -1,8 +1,9 @@
 $(document).ready(function(){
-  var tweetsView
-    , planetView, auidoView
+  var tweetsView, tweetsCollection
+    // , planetView
+    , auidoView
     , controlsView, socket;
-  //tweetsCollection,
+  
 
   // socket connection to the server
   socket = new WebSocket("ws://localhost:9000/socket");
