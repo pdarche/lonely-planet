@@ -1,7 +1,8 @@
 var app = app || {};
 
 var PlanetView = Backbone.View.extend({
-  initialize: function(){    
+  initialize: function(){
+    var self = this;
     // NOTE: review to see which of these are used!
     this.pins = [];
     this.WIDTH = window.innerWidth;
@@ -18,7 +19,11 @@ var PlanetView = Backbone.View.extend({
     this.ASPECT = this.WIDTH / this.HEIGHT;
     this.NEAR = 0.1;
     this.FAR = 10000;
-    
+    this.position = {x: 0, y: 0, z: 1200};
+    this.target = {x: 0, y: 200, z: 250};
+    this.tween = new TWEEN.Tween(this.position)
+                            .to(this.target, 4000);
+
     // setup the scene
     $.proxy(this.setupScene(), this);
     $.proxy(this.setupGlowScene(), this);
@@ -29,6 +34,15 @@ var PlanetView = Backbone.View.extend({
     $.proxy(this.configureGlowScene(), this);
     $.proxy(this.setupFilmEffect(), this);
     $.proxy(this.setupProjector(), this);
+
+    // setup the camera tween
+    this.tween.onUpdate(function(){
+      self.camera.position.z = self.position.z;
+      self.camera.position.y = self.position.y;
+    });
+    this.tween.delay(1000);
+    this.tween.easing(TWEEN.Easing.Quadratic.InOut);
+    this.tween.start();
     
     // add the scene elements and start rendering
     $.proxy(this.addLights(), this);
@@ -62,10 +76,7 @@ var PlanetView = Backbone.View.extend({
     this.group.rotation.y += (0.02).degreesToRadians();
     this.clouds.rotation.y += (0.01).degreesToRadians();
 
-    if (this.camera.position.z > 600){ //&& userPin !== undefined){
-      this.camera.position.z -= 1;
-      this.camera.position.y += .3;
-    }
+    TWEEN.update();
 
     if (this.pins.length > 0) {
       $.each(this.pins, function(i){
@@ -85,6 +96,13 @@ var PlanetView = Backbone.View.extend({
     requestAnimationFrame($.proxy(this.loop, this));
     this.render();
     // controls.update();
+  },
+
+  updateTween: function(){
+    this.tween.onUpdate(function(){
+      this.camera.position.z = this.position.z
+      this.camera.position.y = this.position.y
+    })
   },
 
   newTweet: function(ev){    
@@ -107,7 +125,7 @@ var PlanetView = Backbone.View.extend({
                       this.VIEW_ANGLE, this.ASPECT, 
                       this.NEAR, this.FAR
                     );
-    this.camera.position.set(0, 0, 280);
+    this.camera.position.set(0, 0, 1200);
     this.camera.lookAt(this.scene.position);
     this.scene.add(this.camera);
 
