@@ -24,6 +24,10 @@ var PlanetView = Backbone.View.extend({
     this.tween = new TWEEN.Tween(this.position)
                             .to(this.target, 8000);
 
+    this.mousedown = false;
+    this.mouseX = 0;
+    this.mouseY = 0;
+
     // setup the scene
     $.proxy(this.setupScene(), this);
     $.proxy(this.setupGlowScene(), this);
@@ -46,19 +50,12 @@ var PlanetView = Backbone.View.extend({
 
     //bind resize, mousemove events
     $(window).resize($.proxy(this.resize, this));
-    $(document).mousemove($.proxy(this.mouseMove, this));
+    $(document).mousemove($.proxy(this.onMouseMove, this));
+    $(document).mousedown($.proxy(this.onMouseDown, this));
+    $(document).mouseup($.proxy(this.onMouseUp, this));
 
     // bind new tweet event to the collection
     this.collection.bind('add', $.proxy(this.newTweet, this));
-
-  },
-
-  uAreHere: function(x, y){
-    var userPin = this.dropPin(Number(x), Number(y), 0xFFFFFF)
-      , lat = (90 - Number(x)).degreesToRadians()
-      , lon = (90 + Number(y)).degreesToRadians();
-
-    this.group.add(userPin);
 
   },
 
@@ -71,6 +68,43 @@ var PlanetView = Backbone.View.extend({
     // finalcomposer.render(0.1);
     this.renderer.clear();
     this.composer.render(delta);
+  },
+
+  "events": {
+
+  },
+
+  onMouseMove: function(ev){
+    if (!this.mouseDown) {
+        return;
+    }
+    ev.preventDefault();
+
+    var deltaX = ev.clientX - this.mouseX
+      , deltaY = ev.clientY - this.mouseY;
+
+    this.mouseX = ev.clientX;
+    this.mouseY = ev.clientY;
+    $.proxy(this.rotateScene(deltaX, deltaY), this);
+  },
+
+  onMouseDown: function(ev) {
+    ev.preventDefault();
+
+    this.mouseDown = true;
+    this.mouseX = ev.clientX;
+    this.mouseY = ev.clientY;
+  },
+
+  onMouseUp: function(ev) {
+    ev.preventDefault();
+
+    this.mouseDown = false;
+  },  
+
+  rotateScene: function(deltaX, deltaY){
+    this.group.rotation.y += deltaX / 100;
+    this.group.rotation.x += deltaY / 100;
   },
 
   loop: function() {
@@ -101,6 +135,15 @@ var PlanetView = Backbone.View.extend({
     this.controls.update();
   },
 
+  uAreHere: function(x, y){
+    var userPin = this.dropPin(Number(x), Number(y), 0xFFFFFF)
+      , lat = (90 - Number(x)).degreesToRadians()
+      , lon = (90 + Number(y)).degreesToRadians();
+
+    this.group.add(userPin);
+
+  },  
+
   updateTween: function(){
     this.tween.onUpdate(function(){
       this.camera.position.z = this.position.z
@@ -116,10 +159,6 @@ var PlanetView = Backbone.View.extend({
       
     this.group.add(pin);
     this.pins.unshift(pin);
-  },
-
-  "events": {
-
   },
 
   setupTween: function(){
