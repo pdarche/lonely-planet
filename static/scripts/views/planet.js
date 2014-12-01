@@ -70,16 +70,13 @@ var PlanetView = Backbone.View.extend({
     this.composer.render(delta);
   },
 
-  "events": {
-
-  },
-
   onMouseMove: function(ev){
+    ev.preventDefault();
+
     if (!this.mouseDown) {
         return;
     }
-    ev.preventDefault();
-
+    
     var deltaX = ev.clientX - this.mouseX
       , deltaY = ev.clientY - this.mouseY;
 
@@ -99,6 +96,7 @@ var PlanetView = Backbone.View.extend({
   onMouseUp: function(ev) {
     ev.preventDefault();
 
+    console.log('mouse', this.mouseX)
     this.mouseDown = false;
   },  
 
