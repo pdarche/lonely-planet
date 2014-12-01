@@ -8,6 +8,7 @@ from tornado import websocket
 from config import *
 import os
 import json
+import dstk
 
 GLOBALS={
     'sockets': [],
@@ -18,6 +19,7 @@ GLOBALS={
 
 twitUser = None 
 authenticated = False
+ds = DSTK()
 
 if len(args) < 1:
     args = ['track', 'Lonely']
@@ -31,7 +33,39 @@ else:
 def tweet_callback(status):
     try:
         status = json.loads(status)
-        # todo: geocode the tweet
+        lp_loc = {
+            'lat': None,
+            'lon': None,
+            'name': None
+        }
+
+        if status['geo'] is not None:
+            lp_loc['lat'] = status['geo']['coordinates'][0]
+            lp_loc['lat'] = status['geo']['coordinates'][1]
+
+        if status['coordinates'] is not None:
+            lp_loc['lat'] = status['coordinates']['coordinates'][0]
+            lp_loc['lat'] = status['coordinates']['coordinates'][1]
+
+        if status['place'] is not None:
+            lp_loc['name'] = status['full_name']
+
+        if lp_loc['lat'] is None and status['user']['location'] is not "":
+            # geocode th location
+            lp_loc['name'] = status['user']['location']
+        
+        if lp_loc['lat'] is None and status['place'] is not None:
+            lp_loc['name'] = status['place']
+            coordinates = "%s,%s" % (lp_loc['lat'], lp_loc['lon'])
+            res = ds.coordinates2politics(coordinates)
+
+        if lp_loc['name'] is None and lp_loc['lat'] is not None:
+            # reverse geocode the tweet
+            coordinates = "%s,%s" % (lp_loc['lat'], lp_loc['lon'])
+            res = ds.coordinates2politics(coordinates)
+        
+        print lp_loc
+
         # todo: add the tweet to mongo
         if len(GLOBALS['sockets']) > 0:
             for socket in GLOBALS['sockets']:

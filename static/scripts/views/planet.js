@@ -155,6 +155,11 @@ var PlanetView = Backbone.View.extend({
       , tweet = this.collection.last()
       , pin = this.dropPin(lat, lon, 0xFFFFFF, tweet);
       
+    console.log('coordinates', tweet.get('coordinates'));
+    console.log('geo', tweet.get('geo'));
+    console.log('place', tweet.get('place'));
+    console.log('user', tweet.get('user').location);
+
     this.group.add(pin);
     this.pins.unshift(pin);
   },
