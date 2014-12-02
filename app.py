@@ -38,11 +38,6 @@ def tweet_callback(status):
     dstk_tail = 'sensor=false&callback=?' 
     try:
         status = json.loads(status)
-        lp_loc = {
-            'lat': None,
-            'lon': None,
-            'name': None
-        }
         # if the coordinates are in the status, use them
         coordinates = filter(bool,[status['geo'], status['coordinates']])
         if coordinates:
@@ -50,7 +45,6 @@ def tweet_callback(status):
             lon = coords['coordinates'][1]
             url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail) 
 
-        # if the place is in the 
         elif status['place']:
             split = status['place']['full_name'].split(', ')
             city = split[0]
@@ -59,7 +53,6 @@ def tweet_callback(status):
             url = "%s?%s,+%s,+%s&%s" % (dstk_base, city, state, country, dstk_tail)
 
         elif status['user']['location']:
-                # geocode th location
             location = status['user']['location']
             url = "%s?address=%s&%s" % (dstk_base, location, dstk_tail)
             url = re.sub('\s+', '+', url)
@@ -70,6 +63,12 @@ def tweet_callback(status):
         
         # print url
         # print requests.get(url).json()
+        # if there are results:
+        # lp_loc = {
+        #     'lat': res['results'][0]['location']['lat'],
+        #     'lon': res['results'][0]['location']['lng'],
+        #     'name': res['results'][0]['formatted_address']
+        # }
 
         if len(GLOBALS['sockets']) > 0:
             for socket in GLOBALS['sockets']:
