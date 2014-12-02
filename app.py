@@ -6,6 +6,9 @@ import tornado.auth
 import twitstream
 from tornado import websocket
 from config import *
+
+import requests
+import re
 import os
 import json
 import dstk
@@ -19,7 +22,7 @@ GLOBALS={
 
 twitUser = None 
 authenticated = False
-ds = DSTK()
+ds = dstk.DSTK()
 
 if len(args) < 1:
     args = ['track', 'Lonely']
@@ -31,6 +34,8 @@ else:
         raise NotImplementedError("Unknown method: %s" % method)
 
 def tweet_callback(status):
+    dstk_base = 'http://www.datasciencetoolkit.org/maps/api/geocode/json'
+    dstk_tail = 'sensor=false&callback=?' 
     try:
         status = json.loads(status)
         lp_loc = {
@@ -38,35 +43,34 @@ def tweet_callback(status):
             'lon': None,
             'name': None
         }
+        # if the coordinates are in the status, use them
+        coordinates = filter(bool,[status['geo'], status['coordinates']])
+        if coordinates:
+            lat = coords['coordinates'][0]
+            lon = coords['coordinates'][1]
+            url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail) 
 
-        if status['geo'] is not None:
-            lp_loc['lat'] = status['geo']['coordinates'][0]
-            lp_loc['lat'] = status['geo']['coordinates'][1]
+        # if the place is in the 
+        elif status['place']:
+            split = status['place']['full_name'].split(', ')
+            city = split[0]
+            state = split[1]
+            country = status['place']['country']
+            url = "%s?%s,+%s,+%s&%s" % (dstk_base, city, state, country, dstk_tail)
 
-        if status['coordinates'] is not None:
-            lp_loc['lat'] = status['coordinates']['coordinates'][0]
-            lp_loc['lat'] = status['coordinates']['coordinates'][1]
+        elif status['user']['location']:
+                # geocode th location
+            location = status['user']['location']
+            url = "%s?address=%s&%s" % (dstk_base, location, dstk_tail)
+            url = re.sub('\s+', '+', url)
+            url = re.sub(',', '+', url)
 
-        if status['place'] is not None:
-            lp_loc['name'] = status['full_name']
-
-        if lp_loc['lat'] is None and status['user']['location'] is not "":
-            # geocode th location
-            lp_loc['name'] = status['user']['location']
+        else:
+            return 
         
-        if lp_loc['lat'] is None and status['place'] is not None:
-            lp_loc['name'] = status['place']
-            coordinates = "%s,%s" % (lp_loc['lat'], lp_loc['lon'])
-            res = ds.coordinates2politics(coordinates)
+        # print url
+        # print requests.get(url).json()
 
-        if lp_loc['name'] is None and lp_loc['lat'] is not None:
-            # reverse geocode the tweet
-            coordinates = "%s,%s" % (lp_loc['lat'], lp_loc['lon'])
-            res = ds.coordinates2politics(coordinates)
-        
-        print lp_loc
-
-        # todo: add the tweet to mongo
         if len(GLOBALS['sockets']) > 0:
             for socket in GLOBALS['sockets']:
                 socket.write_message(status)
