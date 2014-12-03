@@ -11,9 +11,6 @@ var PlanetView = Backbone.View.extend({
     this.cloudsScale = 1.005;
     this.theta = 45;
     this.clock = new THREE.Clock();
-    this.showTweet = false;
-    this.prepend = true;
-    this.tweetIndex = 0;
     this.followerCount = 5000;
     this.VIEW_ANGLE = 45;
     this.ASPECT = this.WIDTH / this.HEIGHT;
@@ -96,7 +93,6 @@ var PlanetView = Backbone.View.extend({
   onMouseUp: function(ev) {
     ev.preventDefault();
 
-    console.log('mouse', this.mouseX)
     this.mouseDown = false;
   },  
 
@@ -154,8 +150,6 @@ var PlanetView = Backbone.View.extend({
       , lat = tweet.get('lp_geo').geometry.location.lat
       , lng = tweet.get('lp_geo').geometry.location.lng
       , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet);
-
-    console.log(tweet.get('lp_geo'))
 
     this.group.add(pin);
     this.pins.unshift(pin);

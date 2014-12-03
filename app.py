@@ -39,7 +39,7 @@ def handle_request(response, status):
         print "Error:", response.error
     else:
         res = json.loads(response.body)
-        if res['status'] == "OK" and GLOBALS['sockets']:
+        if res['status'] == "OK":
             status['lp_geo'] = res['results'][0]
             for socket in GLOBALS['sockets']:
                 socket.write_message(status)
@@ -70,10 +70,11 @@ def tweet_callback(status):
             url = re.sub(',', '+', url)
 
         else:
-            return 
+            return
         
-        http_client = tornado.httpclient.AsyncHTTPClient()
-        http_client.fetch(url, lambda response: handle_request(response, status))
+        if GLOBALS['sockets']:
+            http_client = tornado.httpclient.AsyncHTTPClient()
+            http_client.fetch(url, lambda response: handle_request(response, status))
 
     except:
         pass
@@ -120,6 +121,7 @@ class TwitterHandler(tornado.web.RequestHandler,
     @tornado.web.asynchronous
     def get(self):
         if self.get_argument("oauth_token", None):
+            print "the token is %s" % self.get_argument("oauth_token")
             self.get_authenticated_user(self.async_callback(self._on_auth))
             return
         self.authorize_redirect()
