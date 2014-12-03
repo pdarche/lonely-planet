@@ -3,6 +3,7 @@ import tornado.web
 import tornado.httpserver
 import tornado.httputil
 import tornado.auth
+import tornado.httpclient
 import twitstream
 from tornado import websocket
 from config import *
@@ -33,9 +34,20 @@ else:
             method not in twitstream.POSTPARAMS:
         raise NotImplementedError("Unknown method: %s" % method)
 
+def handle_request(response, status):
+    if response.error:
+        print "Error:", response.error
+    else:
+        res = json.loads(response.body)
+        if res['status'] == "OK" and GLOBALS['sockets']:
+            status['lp_geo'] = res['results'][0]
+            for socket in GLOBALS['sockets']:
+                socket.write_message(status)
+
+
 def tweet_callback(status):
     dstk_base = 'http://www.datasciencetoolkit.org/maps/api/geocode/json'
-    dstk_tail = 'sensor=false&callback=?' 
+    dstk_tail = 'sensor=false'
     try:
         status = json.loads(status)
         # if the coordinates are in the status, use them
@@ -61,18 +73,9 @@ def tweet_callback(status):
         else:
             return 
         
-        # print url
-        # print requests.get(url).json()
-        # if there are results:
-        # lp_loc = {
-        #     'lat': res['results'][0]['location']['lat'],
-        #     'lon': res['results'][0]['location']['lng'],
-        #     'name': res['results'][0]['formatted_address']
-        # }
+        http_client = tornado.httpclient.AsyncHTTPClient()
+        http_client.fetch(url, lambda response: handle_request(response, status))
 
-        if len(GLOBALS['sockets']) > 0:
-            for socket in GLOBALS['sockets']:
-                socket.write_message(status)
     except:
         pass
 

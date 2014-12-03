@@ -150,15 +150,12 @@ var PlanetView = Backbone.View.extend({
   },
 
   newTweet: function(ev){    
-    var lat = getRandomInRange(-180, 180, 3)
-      , lon = getRandomInRange(-180, 180, 3)
-      , tweet = this.collection.last()
-      , pin = this.dropPin(lat, lon, 0xFFFFFF, tweet);
-      
-    console.log('coordinates', tweet.get('coordinates'));
-    console.log('geo', tweet.get('geo'));
-    console.log('place', tweet.get('place'));
-    console.log('user', tweet.get('user').location);
+    var tweet = this.collection.last()
+      , lat = tweet.get('lp_geo').geometry.location.lat
+      , lng = tweet.get('lp_geo').geometry.location.lng
+      , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet);
+
+    console.log(tweet.get('lp_geo'))
 
     this.group.add(pin);
     this.pins.unshift(pin);
