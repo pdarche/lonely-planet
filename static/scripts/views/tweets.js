@@ -15,10 +15,7 @@ var TweetsView = Backbone.View.extend({
       this.authenticated = false;
     }
 
-    this.showTweet = false;
     this.prepend = true;
-    this.tweetIndex = 0;
-
 
     // fetch and cache the tweet template
     $.when($.get('/static/scripts/templates/tweet.Handlebars'))
@@ -44,7 +41,8 @@ var TweetsView = Backbone.View.extend({
   events: {
     "mouseover .tweet": "onMouseOver",
     "mouseleave .tweet": "onMouseOut",
-    "click .tweet": "onClick"
+    "click .tweet": "onClick",
+    "click .reply-button": "postReply"
   },
 
   onMouseOver: function(ev){
@@ -54,7 +52,7 @@ var TweetsView = Backbone.View.extend({
   onMouseOut: function(ev){
     var target = $(ev.currentTarget)
       , reply = target.find('.reply')
-      
+
     this.prepend = true;
     reply.fadeOut()
       .queue(function(){
@@ -65,14 +63,30 @@ var TweetsView = Backbone.View.extend({
 
   onClick: function(ev){
     var target = $(ev.currentTarget)
+      , reply = target.find('.reply')
+      , textarea = reply.find('textarea');
+
     if (this.authenticated){
       target.css('width', '655px').delay(450)
         .queue(function(){
-          target.find('.reply').fadeIn();
-          target.find('textarea').focus();
+          reply.fadeIn();
+          textarea.focus();
+          // reply.find('textarea').val('@' + tweet.user.screen_name)
           target.dequeue();
         });
     }
+  },
+
+  postReply: function(ev){
+    ev.preventDefault();
+
+    Backbone.sync("create", Backbone.Model.extend({test: "test"}), {
+      url: "http://127.0.0.1:9000/post", 
+      data: {"data":"test"},
+      success: function(data){
+        console.log(data)
+      }
+    });
   },
 
   cookieCutter: function(cookie){
