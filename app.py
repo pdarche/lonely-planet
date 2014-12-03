@@ -50,7 +50,6 @@ def tweet_callback(status):
     dstk_tail = 'sensor=false'
     try:
         status = json.loads(status)
-        # if the coordinates are in the status, use them
         coordinates = filter(bool,[status['geo'], status['coordinates']])
         if coordinates:
             lat = coords['coordinates'][0]
