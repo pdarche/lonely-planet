@@ -6,7 +6,8 @@ var TweetsView = Backbone.View.extend({
     var self = this
       , cookieKeys
 
-    cookieKeys = self.cookieCutter(document.cookie)
+    this.prepend = true;
+    cookieKeys = this.cookieCutter(document.cookie)
     cookieKeys = Object.keys(cookieKeys)
     
     if (_.indexOf(cookieKeys, "oauth_token") !== -1){
@@ -14,23 +15,21 @@ var TweetsView = Backbone.View.extend({
     } else {
       this.authenticated = false;
     }
-
-    this.prepend = true;
-
     // fetch and cache the tweet template
     $.when($.get('/static/scripts/templates/tweet.Handlebars'))
      .done(function(tmpl){
       self.tmpl = tmpl;
      });
-
     // bind new tweet event to the collection
     this.collection.bind('add', $.proxy(this.render, this));
+
   },
 
   render: function(tweet){
     var source = $(this.tmpl).html()
       , tmpl   = Handlebars.compile(source)
-      , html   = tmpl({"tweet":this.collection.last().toJSON()});
+      , tweet  = this.collection.last()
+      , html   = tmpl({"tweet":tweet.toJSON(), "cid": tweet.cid});
 
     if (this.prepend){
       this.$el.prepend(html);
@@ -64,14 +63,18 @@ var TweetsView = Backbone.View.extend({
   onClick: function(ev){
     var target = $(ev.currentTarget)
       , reply = target.find('.reply')
-      , textarea = reply.find('textarea');
+      , textarea = reply.find('textarea')
+      , cid = target.attr('id')
+      , model = this.collection.get(cid)
+
+    console.log('the tweet model is', model)
 
     if (this.authenticated){
       target.css('width', '655px').delay(450)
         .queue(function(){
           reply.fadeIn();
           textarea.focus();
-          // reply.find('textarea').val('@' + tweet.user.screen_name)
+          textarea.val('@' + model.get('user').screen_name)
           target.dequeue();
         });
     }
@@ -79,12 +82,16 @@ var TweetsView = Backbone.View.extend({
 
   postReply: function(ev){
     ev.preventDefault();
+    var cid = $(ev.currentTarget).parent().parent().attr('id')
+      , model = this.collection.get(cid)
+      , responseText = $(ev.currentTarget).prev().val();
+    
+    model.set('responseText', responseText)
 
-    Backbone.sync("create", Backbone.Model.extend({test: "test"}), {
+    model.sync("create", model, {
       url: "http://127.0.0.1:9000/post", 
-      data: {"data":"test"},
-      success: function(data){
-        console.log(data)
+      success: function(model, res){
+        console.log('success', res);
       }
     });
   },

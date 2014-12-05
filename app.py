@@ -1,13 +1,14 @@
 #!/usr/bin/env python
+from config import *
+
 import tornado.web
 import tornado.httpserver
 import tornado.httputil
 import tornado.auth
 import tornado.httpclient
-import twitstream
 from tornado import websocket
-from config import *
 
+import twitstream
 import requests
 import re
 import os
@@ -74,7 +75,8 @@ def tweet_callback(status):
         
         if GLOBALS['sockets']:
             http_client = tornado.httpclient.AsyncHTTPClient()
-            http_client.fetch(url, lambda response: handle_request(response, status))
+            http_client.fetch(url, 
+                lambda response: handle_request(response, status))
 
     except:
         pass
@@ -121,7 +123,6 @@ class TwitterHandler(tornado.web.RequestHandler,
     @tornado.web.asynchronous
     def get(self):
         if self.get_argument("oauth_token", None):
-            print "the token is %s" % self.get_argument("oauth_token")
             self.get_authenticated_user(self.async_callback(self._on_auth))
             return
         self.authorize_redirect()
@@ -139,31 +140,35 @@ class TwitterHandler(tornado.web.RequestHandler,
 class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
     def post(self):
-        # oAuthToken = self.get_secure_cookie('oauth_token')
-        # oAuthSecret = self.get_secure_cookie('oauth_secret') 
-        # userID = self.get_secure_cookie('user_id')
-        # text = self.get_argument("data")
-        print "incoming data %r" % self.request.body
+        oAuthToken = self.get_secure_cookie('oauth_token')
+        oAuthSecret = self.get_secure_cookie('oauth_secret') 
+        userID = self.get_secure_cookie('user_id')
+        tweet = json.loads(self.request.body)
 
-        # if oAuthToken and oAuthSecret:  
-        #     accessToken = {
-        #         'key': oAuthToken,
-        #         'secret': oAuthSecret 
-        #     }
-        #     self.twitter_request(
-        #         "/statuses/update",
-        #         post_args={"status": text},
-        #         access_token=accessToken,
-        #         callback=self.async_callback(self._on_post)
-        #     )
-        self.finish("success")
+        if oAuthToken and oAuthSecret:  
+            accessToken = {
+                'key': oAuthToken,
+                'secret': oAuthSecret 
+            }
+            data = {
+                'status': tweet['responseText'], 
+                'in_reply_to_status_id': tweet['id']
+            }
+            self.twitter_request(
+                "/statuses/update",
+                post_args=data,
+                access_token=accessToken,
+                callback=self.async_callback(self._on_post)
+            )
+        self.finish()
 
     def _on_post(self, new_entry):
         if not new_entry:
             # Call failed; perhaps missing permission?
             self.authorize_redirect()
             return
-        self.finish("success")
+        self.write(200)
+        self.finish()
 
 
 stream = twitstream.twitstream(method, options.username, options.password, tweet_callback, 
