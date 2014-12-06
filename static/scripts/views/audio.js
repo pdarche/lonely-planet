@@ -29,7 +29,7 @@ var AudioView =  Backbone.View.extend({
       self.tmpl = tmpl;
       self.render();
       self.audioPlayer = document.getElementById('audio_player')
-      self.audioPlayer.play();
+      // self.audioPlayer.play();
      });
 
   },

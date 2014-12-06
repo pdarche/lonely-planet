@@ -35,6 +35,7 @@ var TweetsView = Backbone.View.extend({
       this.$el.prepend(html);
       this.$el.find('.tweet').eq(0).hide().fadeIn()      
     }
+
   },
 
   events: {
@@ -46,6 +47,7 @@ var TweetsView = Backbone.View.extend({
 
   onMouseOver: function(ev){
     this.prepend = false;
+
   },
 
   onMouseOut: function(ev){
@@ -58,6 +60,7 @@ var TweetsView = Backbone.View.extend({
         target.css('width', '300px');
         reply.dequeue();
       });
+
   },
 
   onClick: function(ev){
@@ -67,7 +70,7 @@ var TweetsView = Backbone.View.extend({
       , cid = target.attr('id')
       , model = this.collection.get(cid)
 
-    console.log('the tweet model is', model)
+    console.log('the tweet model is', model);
 
     if (this.authenticated){
       target.css('width', '655px').delay(450)
@@ -78,6 +81,7 @@ var TweetsView = Backbone.View.extend({
           target.dequeue();
         });
     }
+
   },
 
   postReply: function(ev){
@@ -86,14 +90,14 @@ var TweetsView = Backbone.View.extend({
       , model = this.collection.get(cid)
       , responseText = $(ev.currentTarget).prev().val();
     
-    model.set('responseText', responseText)
-
-    model.sync("create", model, {
-      url: "http://127.0.0.1:9000/post", 
+    model.set('responseText', responseText);
+    model.fetch({
+      data: {responseText: responseText},
       success: function(model, res){
         console.log('success', res);
       }
     });
+
   },
 
   cookieCutter: function(cookie){
@@ -106,6 +110,7 @@ var TweetsView = Backbone.View.extend({
         result[cur[0]] = cur[1];
     }
     return result
+
   }
 
 });

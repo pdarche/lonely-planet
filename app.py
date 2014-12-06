@@ -139,11 +139,13 @@ class TwitterHandler(tornado.web.RequestHandler,
 
 class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
-    def post(self):
+    def get(self, tweet_id):
         oAuthToken = self.get_secure_cookie('oauth_token')
         oAuthSecret = self.get_secure_cookie('oauth_secret') 
         userID = self.get_secure_cookie('user_id')
-        tweet = json.loads(self.request.body)
+        text = self.get_argument('responseText')
+        # tweet_id = self.get_argument('tweetId')
+        print "id: %s, text: %s" % (tweet_id, text)
 
         if oAuthToken and oAuthSecret:  
             accessToken = {
@@ -151,8 +153,8 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
                 'secret': oAuthSecret 
             }
             data = {
-                'status': tweet['responseText'], 
-                'in_reply_to_status_id': tweet['id']
+                'status': text, 
+                'in_reply_to_status_id': tweet_id
             }
             self.twitter_request(
                 "/statuses/update",
@@ -160,19 +162,20 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
                 access_token=accessToken,
                 callback=self.async_callback(self._on_post)
             )
-        self.finish()
+        self.finish("success")
 
     def _on_post(self, new_entry):
         if not new_entry:
             # Call failed; perhaps missing permission?
             self.authorize_redirect()
             return
-        self.write(200)
-        self.finish()
 
 
-stream = twitstream.twitstream(method, options.username, options.password, tweet_callback, 
-            defaultdata=args[1:], debug=options.debug, engine=options.engine)   
+stream = twitstream.twitstream(
+            method, options.username, options.password,
+            tweet_callback, defaultdata=args[1:], 
+            debug=options.debug, engine=options.engine
+        )
 
 settings = dict(
     twitter_consumer_key=CONSUMER_KEY,
@@ -188,7 +191,7 @@ if __name__ == "__main__":
             (r"/", IndexHandler),
             (r"/planet", MainHandler),
             (r"/login", TwitterHandler),
-            (r"/post", PostHandler),
+            (r"/post/([0-9]+)", PostHandler),
             (r"/socket", ClientSocket),
             (r"/push", Announcer),
             (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static"}), 
