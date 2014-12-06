@@ -70,8 +70,6 @@ var TweetsView = Backbone.View.extend({
       , cid = target.attr('id')
       , model = this.collection.get(cid)
 
-    console.log('the tweet model is', model);
-
     if (this.authenticated){
       target.css('width', '655px').delay(450)
         .queue(function(){
@@ -86,15 +84,15 @@ var TweetsView = Backbone.View.extend({
 
   postReply: function(ev){
     ev.preventDefault();
-    var cid = $(ev.currentTarget).parent().parent().attr('id')
+    var tweet = $(ev.currentTarget).parent().parent()
+      , cid = tweet.attr('id')
       , model = this.collection.get(cid)
       , responseText = $(ev.currentTarget).prev().val();
     
     model.set('responseText', responseText);
-    model.fetch({
-      data: {responseText: responseText},
-      success: function(model, res){
-        console.log('success', res);
+    model.save(null, {
+      success: function(model, res, options){
+        tweet.find('textarea').val('Reply posted!')
       }
     });
 

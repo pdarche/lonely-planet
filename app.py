@@ -139,13 +139,11 @@ class TwitterHandler(tornado.web.RequestHandler,
 
 class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
-    def get(self, tweet_id):
+    def put(self, tweet_id):
         oAuthToken = self.get_secure_cookie('oauth_token')
         oAuthSecret = self.get_secure_cookie('oauth_secret') 
         userID = self.get_secure_cookie('user_id')
-        text = self.get_argument('responseText')
-        # tweet_id = self.get_argument('tweetId')
-        print "id: %s, text: %s" % (tweet_id, text)
+        tweet = json.loads(self.request.body)
 
         if oAuthToken and oAuthSecret:  
             accessToken = {
@@ -153,8 +151,8 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
                 'secret': oAuthSecret 
             }
             data = {
-                'status': text, 
-                'in_reply_to_status_id': tweet_id
+                'status': tweet['responseText'], 
+                'in_reply_to_status_id': tweet['id']
             }
             self.twitter_request(
                 "/statuses/update",
@@ -162,7 +160,7 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
                 access_token=accessToken,
                 callback=self.async_callback(self._on_post)
             )
-        self.finish("success")
+        self.finish(json.dumps({"code": 200, "response": "success"}))
 
     def _on_post(self, new_entry):
         if not new_entry:
