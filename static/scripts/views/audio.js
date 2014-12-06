@@ -8,17 +8,17 @@ var AudioView =  Backbone.View.extend({
     this.basePath = "static/media/audio/";
     // song filenames
     this.songPaths = [ 
-      "nothing_compares.mp3", "one_more_try.mp3", 
+      "mad_world.mp3", "nothing_compares.mp3", "one_more_try.mp3", 
       "miss_misery.mp3", "nutshell.mp3", 
       "no_surprises.mp3", "hide_and_seek.mp3",
-      "i_know_its_over.mp3", "mad_world.mp3" 
+      "i_know_its_over.mp3"
     ];
     // song titles
     this.songNames = [
-      "Sinead O'Connor - Nothing Compares", "George Michael - One More Try", 
-      "Elliot Smith - Miss Misery", "Alice In Chains - Nutshell",
-      "Radiohead - No Surprises", "Imogen Heap - Hide and Seek",
-      "The Smiths - I Know It's Over", "Gary Jules - Mad World" 
+      "Gary Jules - Mad World" , "Sinead O'Connor - Nothing Compares",
+      "George Michael - One More Try", "Elliot Smith - Miss Misery", 
+      "Alice In Chains - Nutshell", "Radiohead - No Surprises", 
+      "Imogen Heap - Hide and Seek", "The Smiths - I Know It's Over"
     ];
     // song index
     this.songIndex = 0;
@@ -29,7 +29,8 @@ var AudioView =  Backbone.View.extend({
       self.tmpl = tmpl;
       self.render();
       self.audioPlayer = document.getElementById('audio_player')
-      // self.audioPlayer.play();
+      self.audioPlayer.play();
+      self.updateSongTitle();
      });
 
   },
@@ -64,17 +65,18 @@ var AudioView =  Backbone.View.extend({
   
   play : function(){
     this.audioPlayer.play();
-
+    this.updateSongTitle();
   },
   pause: function(){
     this.audioPlayer.pause();
-
+    this.updateSongTitle(); 
   },
   
   forward: function(){
     this.songIndex !== 7 ? this.songIndex++ : this.songIndex = 0;
     this.audioPlayer.src = this.basePath + this.songPaths[this.songIndex]
     this.audioPlayer.play();
+    this.updateSongTitle();
 
   },
 
@@ -82,6 +84,13 @@ var AudioView =  Backbone.View.extend({
     this.songIndex !== 0 ? this.songIndex-- : this.songIndex = 7;
     this.audioPlayer.src = this.basePath + this.songPaths[this.songIndex]
     this.audioPlayer.play();
+    this.updateSongTitle();
 
-  }  
+  },
+
+  updateSongTitle: function(){
+    var currentSongTitle = this.songNames[this.songIndex]
+
+    $('#song_name').html(currentSongTitle)
+  }
 });
