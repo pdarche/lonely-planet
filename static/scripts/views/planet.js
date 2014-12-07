@@ -25,34 +25,43 @@ var PlanetView = Backbone.View.extend({
     this.mouseX = 0;
     this.mouseY = 0;
 
+    _.bindAll(this, 'setupScene', 'setupGlowScene', 
+        'setupRenderer', 'setupTextures', 'setupShaders',
+        'setupPrimarySceneElements', 'configureGlowScene',
+        'setupFilmEffect', 'setupProjector', 'setupTween',
+        'addLights', 'addStars', 'addControls', 'loop',
+        'render', 'resize', 'onMouseMove', 'onMouseDown', 
+        'onMouseUp', 'newTweet', 'rotateScene', 'uAreHere'
+    )
+
     // setup the scene
-    $.proxy(this.setupScene(), this);
-    $.proxy(this.setupGlowScene(), this);
-    $.proxy(this.setupRenderer(), this);
-    $.proxy(this.setupTextures(), this);
-    $.proxy(this.setupShaders(), this); 
-    $.proxy(this.setupPrimarySceneElements(), this);
-    $.proxy(this.configureGlowScene(), this);
-    $.proxy(this.setupFilmEffect(), this);
-    $.proxy(this.setupProjector(), this);
+    this.setupScene();
+    this.setupGlowScene();
+    this.setupRenderer();
+    this.setupTextures();
+    this.setupShaders() 
+    this.setupPrimarySceneElements();
+    this.configureGlowScene();
+    this.setupFilmEffect();
+    this.setupProjector();
     // get the user's location
-    GEO_LOCATION.getLocation($.proxy(this.uAreHere, this), 12000);
+    GEO_LOCATION.getLocation(this.uAreHere, 12000);
     // setup the camera tween
-    $.proxy(this.setupTween(), this);
+    this.setupTween();
     // add the scene elements and start rendering
-    $.proxy(this.addLights(), this);
-    $.proxy(this.addStars(), this);
-    $.proxy(this.addControls(), this);
-    $.proxy(this.loop(), this);
+    this.addLights();
+    this.addStars();
+    this.addControls();
+    this.loop();
 
     //bind resize, mousemove events
-    $(window).resize($.proxy(this.resize, this));
-    $(document).mousemove($.proxy(this.onMouseMove, this));
-    $(document).mousedown($.proxy(this.onMouseDown, this));
-    $(document).mouseup($.proxy(this.onMouseUp, this));
+    $(window).resize(this.resize);
+    $(document).mousemove(this.onMouseMove);
+    $(document).mousedown(this.onMouseDown);
+    $(document).mouseup(this.onMouseUp);
 
     // bind new tweet event to the collection
-    this.collection.bind('add', $.proxy(this.newTweet, this));
+    this.collection.bind('add', this.newTweet);
 
   },
 
@@ -79,7 +88,7 @@ var PlanetView = Backbone.View.extend({
 
     this.mouseX = ev.clientX;
     this.mouseY = ev.clientY;
-    $.proxy(this.rotateScene(deltaX, deltaY), this);
+    this.rotateScene(deltaX, deltaY);
   },
 
   onMouseDown: function(ev) {
@@ -124,7 +133,7 @@ var PlanetView = Backbone.View.extend({
       });
     }
 
-    requestAnimationFrame($.proxy(this.loop, this));
+    requestAnimationFrame(this.loop);
     this.render();
     this.controls.update();
   },
@@ -426,7 +435,7 @@ var PlanetView = Backbone.View.extend({
     this.controls.dynamicDampingFactor = 0.3;
     this.controls.keys = [65, 83, 68];
 
-    this.controls.addEventListener('change', $.proxy(this.render, this));
+    this.controls.addEventListener('change', this.render);
 
   },
 

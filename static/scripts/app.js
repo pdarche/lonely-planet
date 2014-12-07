@@ -1,8 +1,9 @@
 $(document).ready(function(){
-  var tweetsCollection
+  var tweetsView, tweetsCollection
     , planetView, auidoView
     , controlsView, socket;
   
+  // event delegator for inter-view event handling
   vent = _.extend({}, Backbone.Events);
   // socket connection to the server
   socket = new WebSocket("ws://localhost:9000/socket");
