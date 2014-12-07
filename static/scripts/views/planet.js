@@ -478,7 +478,7 @@ var PlanetView = Backbone.View.extend({
       })
     );
     indicator = new THREE.Mesh(
-      new THREE.CylinderGeometry( .5, .5, 4, 25, false ),
+      new THREE.CylinderGeometry(.5, .5, 4, 25, false),
       new THREE.MeshBasicMaterial({ 
         color: color,
         transparent : true,
@@ -492,12 +492,12 @@ var PlanetView = Backbone.View.extend({
     group1.add(indicator);
     group2.add(group1);
     group1.add(marker);
-    group1.rotation.x = ( 90 - latitude  ).degreesToRadians();
+    group1.rotation.x = (90 - latitude).degreesToRadians();
     group2.add(group1);
-    group2.rotation.y = ( 90 + longitude ).degreesToRadians();
+    group2.rotation.y = (90 + longitude).degreesToRadians();
 
     group2.tweet = tweet;
-    group2.geo = {lat : latitude, lon : longitude};
+    group2.geo = {lat: latitude, lon: longitude};
     group2.dead = false;
 
     group2.fadeMarker = function(){

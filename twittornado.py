@@ -136,7 +136,6 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
         return headers
 
 
-
 def to_header(parameters, realm=''):
     """
     Serialize as a header for an HTTPAuth request.
@@ -152,7 +151,3 @@ def to_header(parameters, realm=''):
                 auth_header += '%s="%s", ' % (k, parameters[k])
     return {'Authorization': auth_header[:-2]}
 
-
-class DictObj(object):
-    def __getattr__(self, attr):
-        return self.__dict__.get(attr)        

@@ -27,7 +27,7 @@ authenticated = False
 ds = dstk.DSTK()
 
 if len(args) < 1:
-    args = ['track', 'Lonely']
+    args = ['track', 'lonely']
     method = 'track'
 else:
     method = args[0]
@@ -75,7 +75,7 @@ def tweet_callback(status):
         
         if GLOBALS['sockets']:
             http_client = tornado.httpclient.AsyncHTTPClient()
-            http_client.fetch(url, 
+            http_client.fetch(url,
                 lambda response: handle_request(response, status))
 
     except:
@@ -137,7 +137,8 @@ class TwitterHandler(tornado.web.RequestHandler,
         self.redirect('/planet')
         
 
-class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
+class PostHandler(tornado.web.RequestHandler, 
+                    tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
     def put(self, tweet_id):
         oAuthToken = self.get_secure_cookie('oauth_token')
@@ -160,7 +161,8 @@ class PostHandler(tornado.web.RequestHandler, tornado.auth.TwitterMixin):
                 access_token=accessToken,
                 callback=self.async_callback(self._on_post)
             )
-        self.finish(json.dumps({"code": 200, "response": "success"}))
+        res = json.dumps({"code": 200, "response": "success"})
+        self.finish(res)
 
     def _on_post(self, new_entry):
         if not new_entry:
