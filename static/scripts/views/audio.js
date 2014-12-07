@@ -31,6 +31,9 @@ var AudioView =  Backbone.View.extend({
       self.audioPlayer = document.getElementById('audio_player')
       self.audioPlayer.play();
       self.updateSongTitle();
+
+       _.bindAll(self, 'onEnded');
+       self.$('#audio_player').on('ended', self.onEnded);      
      });
 
   },
@@ -49,7 +52,8 @@ var AudioView =  Backbone.View.extend({
     "click #pause": "pause",
     "click #forward": "forward",
     "click #back": "back",
-    "click #play, #pause": "toggleActiveAudio"
+    "click #play, #pause": "toggleActiveAudio",
+    "ended #audio_player": "onEnded"
   },
 
   toggleControls: function(){
@@ -92,5 +96,11 @@ var AudioView =  Backbone.View.extend({
     var currentSongTitle = this.songNames[this.songIndex]
 
     $('#song_name').html(currentSongTitle)
+  },
+
+  onEnded: function(){
+    this.forward();
+    this.updateSongTitle();
   }
+
 });
