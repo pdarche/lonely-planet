@@ -32,8 +32,9 @@ var AudioView =  Backbone.View.extend({
       self.audioPlayer.play();
       self.updateSongTitle();
 
-       _.bindAll(self, 'onEnded');
-       self.$('#audio_player').on('ended', self.onEnded);      
+       _.bindAll(self, 'onEnded', 'bindSlider');
+       self.$('#audio_player').on('ended', self.onEnded);
+       self.bindSlider();
      });
 
   },
@@ -108,6 +109,22 @@ var AudioView =  Backbone.View.extend({
     vent.trigger('toggleTweets');
     this.$el.find('.option.active').removeClass('active')
     $(ev.currentTarget).addClass('active')
+  },
+
+  bindSlider: function(){
+    this.$('#follower_count_slider').slider({
+      min: 0,
+      max: 10000,
+      value:10000,
+      slide: function(event, ui){
+        $('#slider_pos').html(ui.value);
+        vent.trigger('updateFollowerCount', ui.value);
+        vent.trigger('toggleControls', false);
+      },
+      change: function(event, ui){
+        vent.trigger('toggleControls', false);
+      }
+    });
   }
 
 });

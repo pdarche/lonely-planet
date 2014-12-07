@@ -11,7 +11,7 @@ var PlanetView = Backbone.View.extend({
     this.cloudsScale = 1.005;
     this.theta = 45;
     this.clock = new THREE.Clock();
-    this.followerCount = 5000;
+    this.followerCount = 10000;
     this.VIEW_ANGLE = 45;
     this.ASPECT = this.WIDTH / this.HEIGHT;
     this.NEAR = 0.1;
@@ -23,13 +23,13 @@ var PlanetView = Backbone.View.extend({
     this.mousedown = false;
     this.mouseX = 0;
     this.mouseY = 0;
-    
-    _.bindAll(this, 'setupScene', 'setupGlowScene', 
+
+    _.bindAll(this, 'setupScene', 'setupGlowScene',
       'setupRenderer', 'setupTextures', 'setupShaders',
       'setupPrimarySceneElements', 'configureGlowScene',
       'setupFilmEffect', 'setupProjector', 'setupTween',
       'addLights', 'addStars', 'addControls', 'loop',
-      'render', 'resize', 'onMouseMove', 'onMouseDown', 
+      'render', 'resize', 'onMouseMove', 'onMouseDown',
       'onMouseUp', 'newTweet', 'rotateScene', 'uAreHere'
     )
 
@@ -38,7 +38,7 @@ var PlanetView = Backbone.View.extend({
     this.setupGlowScene();
     this.setupRenderer();
     this.setupTextures();
-    this.setupShaders() 
+    this.setupShaders()
     this.setupPrimarySceneElements();
     this.configureGlowScene();
     this.setupFilmEffect();
@@ -81,7 +81,7 @@ var PlanetView = Backbone.View.extend({
     if (!this.mouseDown) {
         return;
     }
-    
+
     var deltaX = ev.clientX - this.mouseX
       , deltaY = ev.clientY - this.mouseY;
 
@@ -102,7 +102,7 @@ var PlanetView = Backbone.View.extend({
     ev.preventDefault();
 
     this.mouseDown = false;
-  },  
+  },
 
   rotateScene: function(deltaX, deltaY){
     this.group.rotation.y += deltaX / 100;
@@ -143,24 +143,25 @@ var PlanetView = Backbone.View.extend({
       , lon = (90 + Number(y)).degreesToRadians();
 
     this.group.add(userPin);
-
-  },  
+  },
 
   updateTween: function(){
     this.tween.onUpdate(function(){
       this.camera.position.z = this.position.z
       this.camera.position.y = this.position.y
-    })
+    });
   },
 
-  newTweet: function(ev){    
+  newTweet: function(ev){
     var tweet = this.collection.last()
       , lat = tweet.get('lp_geo').geometry.location.lat
       , lng = tweet.get('lp_geo').geometry.location.lng
       , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet);
 
-    this.group.add(pin);
-    this.pins.unshift(pin);
+    if (tweet.get('user').followers_count <= this.followerCount){
+      this.group.add(pin);
+      this.pins.unshift(pin);
+    }
   },
 
   setupTween: function(){
@@ -175,10 +176,10 @@ var PlanetView = Backbone.View.extend({
     this.tween.start();
   },
 
-  setupScene: function() {    
+  setupScene: function() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
-                      this.VIEW_ANGLE, this.ASPECT, 
+                      this.VIEW_ANGLE, this.ASPECT,
                       this.NEAR, this.FAR
                     );
     this.camera.position.set(0, 0, 1200);
@@ -190,7 +191,7 @@ var PlanetView = Backbone.View.extend({
   setupGlowScene: function() {
     this.glowscene = new THREE.Scene();
     this.glowcamera = new THREE.PerspectiveCamera(
-                          this.VIEW_ANGLE, this.ASPECT, 
+                          this.VIEW_ANGLE, this.ASPECT,
                           this.NEAR, this.FAR
                         );
     this.glowcamera.position = this.camera.position;
@@ -212,7 +213,7 @@ var PlanetView = Backbone.View.extend({
   // NOTE: RENAME!
   setupTextures: function() {
     var base = "static/media/final-images/";
-    
+
     this.group = new THREE.Object3D();
     this.planetTexture = THREE.ImageUtils.loadTexture(base + "earth_atmos.jpg");
     this.cloudsTexture = THREE.ImageUtils.loadTexture(base + "earth_clouds.png");
@@ -256,19 +257,19 @@ var PlanetView = Backbone.View.extend({
     this.earthRadius = 90;
     earth = new THREE.Mesh(
       new THREE.SphereGeometry(this.earthRadius, 64, 64),
-      new THREE.MeshPhongMaterial({ 
-        map: this.planetTexture,  //THREE.ImageUtils.loadTexture( 'static/media/good-earth/small-map.jpg' ), 
-        transparency: true, 
-        opacity: 1, 
-        ambient: 0xFFFFFF, 
-        color: 0xFFFFFF, 
-        specular: 0xFFFFFF, 
-        shininess: 5, 
-        perPixel: true, 
-        metal: true 
+      new THREE.MeshPhongMaterial({
+        map: this.planetTexture,  //THREE.ImageUtils.loadTexture( 'static/media/good-earth/small-map.jpg' ),
+        transparency: true,
+        opacity: 1,
+        ambient: 0xFFFFFF,
+        color: 0xFFFFFF,
+        specular: 0xFFFFFF,
+        shininess: 5,
+        perPixel: true,
+        metal: true
       })
     );
-    
+
     earth.position.set(0, 0, 0);
     earth.receiveShadow = true;
     earth.castShadow = true;
@@ -276,7 +277,7 @@ var PlanetView = Backbone.View.extend({
 
     this.clouds = new THREE.Mesh(
       new THREE.SphereGeometry(this.earthRadius + 2, 32, 32),
-      new THREE.MeshLambertMaterial({ 
+      new THREE.MeshLambertMaterial({
         color: 0xffffff,
         map: this.cloudsTexture, //THREE.ImageUtils.loadTexture( 'static/media/good-earth/small-clouds.png' ),
         transparent: true
@@ -293,16 +294,16 @@ var PlanetView = Backbone.View.extend({
 
   configureGlowScene: function(){
     var atmosphere;
-    
+
     atmosphere = new THREE.Mesh(
       new THREE.SphereGeometry(this.earthRadius + 4, 32, 32 ),
       new THREE.MeshPhongMaterial({
-        transparency: true, 
-        opacity: .1, 
-        ambient: 0xFFFFFF, 
-        color: 0xFFFFFF, 
-        specular: 0xFFFFFF, 
-        shininess: 25, 
+        transparency: true,
+        opacity: .1,
+        ambient: 0xFFFFFF,
+        color: 0xFFFFFF,
+        specular: 0xFFFFFF,
+        shininess: 25,
         perPixel: true
       })
     );
@@ -317,9 +318,9 @@ var PlanetView = Backbone.View.extend({
   setupFilmEffect: function(){
     this.renderModel = new THREE.RenderPass(this.scene, this.camera);
     this.effectFilm = new THREE.FilmPass(0.35, 0.75, 2048, false);
-    
+
     this.effectFilm.renderToScreen = true;
-    
+
     this.composer = new THREE.EffectComposer(this.renderer);
     this.composer.addPass(this.renderModel);
     this.composer.addPass(this.effectFilm);
@@ -332,7 +333,7 @@ var PlanetView = Backbone.View.extend({
 
     this.projector = new THREE.Projector();
     plane = new THREE.Mesh(
-              new THREE.PlaneGeometry(1000, 1000), 
+              new THREE.PlaneGeometry(1000, 1000),
               new THREE.MeshBasicMaterial()
             );
     // plane.rotation.x = - Math.PI / 2;
@@ -349,18 +350,18 @@ var PlanetView = Backbone.View.extend({
 
   addLights: function() {
     var ambient, directional
-    
+
     // add earth ambient light
     ambient = new THREE.AmbientLight(0x111111);
     this.scene.add(ambient);
-    
-    // add earth directional light 
+
+    // add earth directional light
     directional = new THREE.DirectionalLight(0xDDDDDDD);
     directional.castShadow = true;
     this.scene.add(directional);
-    
+
     // add glowscene ambient light
-    this.glowscene.add(new THREE.AmbientLight(0xffffff)); 
+    this.glowscene.add(new THREE.AmbientLight(0xffffff));
 
     // add optional light params
     directional.position.set( 1, 0, 1).normalize();
@@ -370,7 +371,7 @@ var PlanetView = Backbone.View.extend({
 
   addStars: function() {
     var i, r, starsGeometry, stars, starsMaterials;
-    
+
     r = 10;
     starsGeometry = [new THREE.Geometry(), new THREE.Geometry()];
 
@@ -472,14 +473,14 @@ var PlanetView = Backbone.View.extend({
     markerLength = 10
     marker = new THREE.Mesh(
       new THREE.CylinderGeometry(.05, .25, 15, false),
-      new THREE.MeshBasicMaterial({ 
+      new THREE.MeshBasicMaterial({
         color: color,
         transparent : true,
       })
     );
     indicator = new THREE.Mesh(
       new THREE.CylinderGeometry(.5, .5, 4, 25, false),
-      new THREE.MeshBasicMaterial({ 
+      new THREE.MeshBasicMaterial({
         color: color,
         transparent : true,
       })
@@ -512,7 +513,7 @@ var PlanetView = Backbone.View.extend({
       if (this.children[0].children[0].material.opacity > .5){
         this.children[0].children[0].material.opacity -= .03
       }
-    } 
+    }
 
     group2.spike = function(){
       if (this.children[0].children[1].scale.y < 3 && !this.dead) {
@@ -522,7 +523,7 @@ var PlanetView = Backbone.View.extend({
     }
 
     return group2
-  }  
+  }
 
 });
 

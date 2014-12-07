@@ -27,6 +27,15 @@ $(document).ready(function(){
   vent.on('toggleTweets', function(msg){
     tweetsView.toggleTweets()
   })
+
+  vent.on('toggleControls', function(bool){
+    planetView.controls.enabled = bool
+  })
+
+  vent.on('updateFollowerCount', function(count){
+    tweetsView.followerCount = count;
+    planetView.followerCount = count;
+  })
   // on message, create a new tweetModel
   // and add it tweet to the collection
   socket.onmessage = function(ev){
