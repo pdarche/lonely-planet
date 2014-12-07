@@ -41,7 +41,6 @@ var TweetsView = Backbone.View.extend({
           $(this).dequeue();
         });
     }
-
   },
 
   events: {
@@ -53,7 +52,6 @@ var TweetsView = Backbone.View.extend({
 
   onMouseOver: function(ev){
     this.prepend = false;
-
   },
 
   onMouseOut: function(ev){
@@ -66,7 +64,6 @@ var TweetsView = Backbone.View.extend({
         target.css('width', '300px');
         reply.dequeue();
       });
-
   },
 
   onClick: function(ev){

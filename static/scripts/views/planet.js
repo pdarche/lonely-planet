@@ -31,7 +31,7 @@ var PlanetView = Backbone.View.extend({
       'addLights', 'addStars', 'addControls', 'loop',
       'render', 'resize', 'onMouseMove', 'onMouseDown',
       'onMouseUp', 'newTweet', 'rotateScene', 'uAreHere'
-    )
+    );
 
     // setup the scene
     this.setupScene();
@@ -138,9 +138,10 @@ var PlanetView = Backbone.View.extend({
   },
 
   uAreHere: function(x, y){
-    var userPin = this.dropPin(Number(x), Number(y), 0xFFFFFF)
-      , lat = (90 - Number(x)).degreesToRadians()
-      , lon = (90 + Number(y)).degreesToRadians();
+    var userPin = this.dropPin(Number(x), Number(y), 0xFFFFFF);
+
+    this.userLat = Number(x)
+    this.userLng = Number(y)
 
     this.group.add(userPin);
   },
@@ -156,7 +157,12 @@ var PlanetView = Backbone.View.extend({
     var tweet = this.collection.last()
       , lat = tweet.get('lp_geo').geometry.location.lat
       , lng = tweet.get('lp_geo').geometry.location.lng
-      , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet);
+      , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet)
+      , distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
+
+    if (this.userLat){
+      tweet.set('dist_from_user', distFromUser);
+    }
 
     if (tweet.get('user').followers_count <= this.followerCount){
       this.group.add(pin);
@@ -523,11 +529,21 @@ var PlanetView = Backbone.View.extend({
     }
 
     return group2
+  },
+
+  distBtw: function(lat1, lon1, lat2, lon2, unit) {
+    // if ( unit === undefined ) unit = 3958.761;
+    var r = 3958.761; //this.validateRadius(unit);
+    lat1 *= Math.PI / 180;
+    lon1 *= Math.PI / 180;
+    lat2 *= Math.PI / 180;
+    lon2 *= Math.PI / 180;
+    var lonDelta = lon2 - lon1;
+    var a = Math.pow(Math.cos(lat2) * Math.sin(lonDelta) , 2) + Math.pow(Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lonDelta) , 2);
+    var b = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lonDelta);
+    var angle = Math.atan2(Math.sqrt(a) , b);
+
+    return angle * r;
   }
 
 });
-
-
-function getRandomInRange(from, to, fixed) {
-  return (Math.random() * (to - from) + from).toFixed(fixed) * 1;
-}
