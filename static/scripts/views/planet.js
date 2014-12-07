@@ -20,18 +20,17 @@ var PlanetView = Backbone.View.extend({
     this.target = {x: 0, y: 200, z: 250};
     this.tween = new TWEEN.Tween(this.position)
                             .to(this.target, 8000);
-
     this.mousedown = false;
     this.mouseX = 0;
     this.mouseY = 0;
-
+    
     _.bindAll(this, 'setupScene', 'setupGlowScene', 
-        'setupRenderer', 'setupTextures', 'setupShaders',
-        'setupPrimarySceneElements', 'configureGlowScene',
-        'setupFilmEffect', 'setupProjector', 'setupTween',
-        'addLights', 'addStars', 'addControls', 'loop',
-        'render', 'resize', 'onMouseMove', 'onMouseDown', 
-        'onMouseUp', 'newTweet', 'rotateScene', 'uAreHere'
+      'setupRenderer', 'setupTextures', 'setupShaders',
+      'setupPrimarySceneElements', 'configureGlowScene',
+      'setupFilmEffect', 'setupProjector', 'setupTween',
+      'addLights', 'addStars', 'addControls', 'loop',
+      'render', 'resize', 'onMouseMove', 'onMouseDown', 
+      'onMouseUp', 'newTweet', 'rotateScene', 'uAreHere'
     )
 
     // setup the scene
