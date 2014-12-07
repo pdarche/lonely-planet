@@ -126,7 +126,7 @@ h1{
 	-webkit-transition: all .25s;
 }
 
-.hidden_tweets{
+.hidden-tweets{
 	left:-350px;
 	-webkit-transition: all .25s;	
 }

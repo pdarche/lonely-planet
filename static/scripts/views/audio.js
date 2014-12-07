@@ -53,7 +53,8 @@ var AudioView =  Backbone.View.extend({
     "click #forward": "forward",
     "click #back": "back",
     "click #play, #pause": "toggleActiveAudio",
-    "ended #audio_player": "onEnded"
+    "ended #audio_player": "onEnded",
+    "click #show_tweets, #hide_tweets": "toggleTweets",
   },
 
   toggleControls: function(){
@@ -101,6 +102,12 @@ var AudioView =  Backbone.View.extend({
   onEnded: function(){
     this.forward();
     this.updateSongTitle();
+  },
+
+  toggleTweets: function(ev){
+    vent.trigger('toggleTweets');
+    this.$el.find('.option.active').removeClass('active')
+    $(ev.currentTarget).addClass('active')
   }
 
 });

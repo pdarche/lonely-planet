@@ -109,6 +109,16 @@ var TweetsView = Backbone.View.extend({
     }
     return result
 
+  },
+
+  toggleTweets: function() {
+    if (this.$el.parent().hasClass('shown')){
+      this.$el.parent().removeClass('shown')
+                    .addClass('hidden-tweets')
+    } else {
+      this.$el.parent().removeClass('hidden-tweets')
+              .addClass('shown')
+    }
   }
 
 });
