@@ -7,7 +7,7 @@ import urllib
 import sys
 from urlparse import urlparse
 from tornado import iostream, ioloop
-from config import *
+from config import settings
 import json
 import ssl
 
@@ -43,7 +43,7 @@ class TwitterStreamGET(object):
             self.connect( self.proxy )
         else:
             self.connect( (self.host, 443) )
-    
+
     @property
     def request(self):
         request  = 'GET %s HTTP/1.1\r\n' % self.url
@@ -52,13 +52,13 @@ class TwitterStreamGET(object):
         request += 'User-Agent: %s\r\n' % USERAGENT
         request += '\r\n'
         return request
-    
+
     def connect(self, host):
         self.sock.connect(host)
         self.sock = ssl.wrap_socket(self.sock, do_handshake_on_connect=False)
         self.stream = iostream.SSLIOStream(self.sock)
-    
-    def found_terminator(self, data):        
+
+    def found_terminator(self, data):
         if data.startswith("HTTP/1") and not data.endswith("200 OK\r\n"):
             print >> sys.stderr, data
         if data.startswith('{'):
@@ -72,7 +72,7 @@ class TwitterStreamGET(object):
         self.stream.write(self.request)
         self.stream.read_until(self.terminator, self.found_terminator)
         ioloop.IOLoop.instance().start()
-    
+
     def cleanup(self):
         self.stream.close()
 
@@ -94,7 +94,7 @@ class TwitterStreamPOST(TwitterStreamGET):
         request += '\r\n'
         request += '%s' % data
         return request
- 
+
 
 class TwitterStreamOAuth2POST(TwitterStreamGET):
     def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
@@ -117,8 +117,10 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
         return request
 
     def create_oauth_header(self, data):
-        consumer = oauth2.Consumer(key=CONSUMER_KEY, secret=CONSUMER_SECRET)
-        token = oauth2.Token(ACCESS_KEY, ACCESS_SECRET)
+        consumer = oauth2.Consumer(
+            key=settings['CONSUMER_KEY'],secret=settings['CONSUMER_SECRET'])
+        token = oauth2.Token(
+            settings['ACCESS_KEY'], settings['ACCESS_SECRET'])
 
         params = {
             'oauth_version': "1.0",
@@ -132,7 +134,7 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
         oauth_req = oauth2.Request(method="POST", url=RESOURCE_URL, parameters=params)
         signature_method = oauth2.SignatureMethod_HMAC_SHA1()
         oauth_req.sign_request(signature_method, consumer, token, include_body_hash=False)
-        headers = oauth_req.to_header() 
+        headers = oauth_req.to_header()
         return headers
 
 

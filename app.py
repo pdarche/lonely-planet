@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from config import *
+from config import settings
 
 import tornado.web
 import tornado.httpserver
@@ -22,7 +22,7 @@ GLOBALS={
 
 (options, args) = twitstream.parser.parse_args()
 
-twitUser = None 
+twitUser = None
 authenticated = False
 ds = dstk.DSTK()
 
@@ -55,7 +55,7 @@ def tweet_callback(status):
         if coordinates:
             lat = coords['coordinates'][0]
             lon = coords['coordinates'][1]
-            url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail) 
+            url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail)
 
         elif status['place']:
             split = status['place']['full_name'].split(', ')
@@ -72,7 +72,7 @@ def tweet_callback(status):
 
         else:
             return
-        
+
         if GLOBALS['sockets']:
             http_client = tornado.httpclient.AsyncHTTPClient()
             http_client.fetch(url,
@@ -88,10 +88,10 @@ class IndexHandler(tornado.web.RequestHandler):
 
 
 class MainHandler(tornado.web.RequestHandler):
-    def get(self):   
+    def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Credentials", "true")
-        self.set_header("Access-Control-Allow-Methods", "GET")        
+        self.set_header("Access-Control-Allow-Methods", "GET")
 
         token = self.get_secure_cookie('oauth_token')
         self.render('planet.html', authenticated=token)
@@ -101,7 +101,7 @@ class ClientSocket(websocket.WebSocketHandler):
     def open(self):
         GLOBALS['sockets'].append(self)
         global twitUser
-        if twitUser != None:                
+        if twitUser != None:
             GLOBALS['users'].append(twitUser)
         print "WebSocket opened"
 
@@ -116,7 +116,7 @@ class Announcer(tornado.web.RequestHandler):
         for socket in GLOBALS['sockets']:
             socket.write_message(data)
         self.write('Posted')
-  
+
 
 class TwitterHandler(tornado.web.RequestHandler,
                         tornado.auth.TwitterMixin):
@@ -135,24 +135,24 @@ class TwitterHandler(tornado.web.RequestHandler,
         self.set_secure_cookie('oauth_secret', user['access_token']['secret'])
 
         self.redirect('/planet')
-        
 
-class PostHandler(tornado.web.RequestHandler, 
+
+class PostHandler(tornado.web.RequestHandler,
                     tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
     def put(self, tweet_id):
         oAuthToken = self.get_secure_cookie('oauth_token')
-        oAuthSecret = self.get_secure_cookie('oauth_secret') 
+        oAuthSecret = self.get_secure_cookie('oauth_secret')
         userID = self.get_secure_cookie('user_id')
         tweet = json.loads(self.request.body)
 
-        if oAuthToken and oAuthSecret:  
+        if oAuthToken and oAuthSecret:
             accessToken = {
                 'key': oAuthToken,
-                'secret': oAuthSecret 
+                'secret': oAuthSecret
             }
             data = {
-                'status': tweet['responseText'], 
+                'status': tweet['responseText'],
                 'in_reply_to_status_id': tweet['id']
             }
             self.twitter_request(
@@ -173,16 +173,16 @@ class PostHandler(tornado.web.RequestHandler,
 
 stream = twitstream.twitstream(
             method, options.username, options.password,
-            tweet_callback, defaultdata=args[1:], 
+            tweet_callback, defaultdata=args[1:],
             debug=options.debug, engine=options.engine
         )
 
 settings = dict(
-    twitter_consumer_key=CONSUMER_KEY,
-    twitter_consumer_secret=CONSUMER_SECRET,
-    cookie_secret=COOKIE_SECRET,
+    twitter_consumer_key=settings['CONSUMER_KEY'],
+    twitter_consumer_secret=settings['CONSUMER_SECRET'],
+    cookie_secret=settings['COOKIE_SECRET'],
     template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
-    static_path=os.path.join(os.path.dirname(__file__), "static")          
+    static_path=os.path.join(os.path.dirname(__file__), "static")
 )
 
 if __name__ == "__main__":
@@ -194,8 +194,8 @@ if __name__ == "__main__":
             (r"/post/([0-9]+)", PostHandler),
             (r"/socket", ClientSocket),
             (r"/push", Announcer),
-            (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static"}), 
-        ], 
+            (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static"}),
+        ],
         **settings
 	)
 	http_server = tornado.httpserver.HTTPServer(app)
