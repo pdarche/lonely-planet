@@ -15,6 +15,10 @@ import re
 import os
 import json
 import dstk
+from pymongo import MongoClient
+
+client = MongoClient('localhost', 27017)
+db = client.lonely_planet
 
 GLOBALS={
     'sockets': [],
@@ -22,7 +26,6 @@ GLOBALS={
 }
 
 (options, args) = twitstream.parser.parse_args()
-
 twitUser = None
 authenticated = False
 ds = dstk.DSTK()
@@ -47,8 +50,18 @@ def handle_request(response, status):
                 socket.write_message(status)
 
 
-def save_tweet(status):
-    """ """
+def insert_tweet(status):
+    """ Inserts tweet into Mongo"""
+
+    status['replies'] = []
+    return db.tweets.insert(status)
+
+def add_tweet_reply(tweet_id, user, text):
+    """Adds a reply to the saved tweet"""
+
+    reply = {'user': user, 'text': text}
+    return db.tweets.update(
+        {'id_str': tweet_id}, {'$push': {'replies': reply}}, True)
 
 @tornado.gen.coroutine
 def tweet_callback(status):
@@ -87,6 +100,7 @@ def tweet_callback(status):
             http_client = tornado.httpclient.AsyncHTTPClient()
             response = yield http_client.fetch(url)
             handle_request(response, status)
+            insert_tweet(status)
 
     except:
         pass
@@ -153,7 +167,7 @@ class PostHandler(tornado.web.RequestHandler,
     def put(self, tweet_id):
         oAuthToken = self.get_secure_cookie('oauth_token')
         oAuthSecret = self.get_secure_cookie('oauth_secret')
-        userID = self.get_secure_cookie('user_id')
+        user_id = self.get_secure_cookie('user_id')
         tweet = json.loads(self.request.body)
 
         if oAuthToken and oAuthSecret:
@@ -171,6 +185,8 @@ class PostHandler(tornado.web.RequestHandler,
                 access_token=accessToken,
                 callback=self.async_callback(self._on_post)
             )
+            add_tweet_reply(tweet_id, user_id, tweet['responseText'])
+
         res = json.dumps({"code": 200, "response": "success"})
         self.finish(res)
 
