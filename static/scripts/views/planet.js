@@ -38,7 +38,7 @@ var PlanetView = Backbone.View.extend({
     this.setupGlowScene();
     this.setupRenderer();
     this.setupTextures();
-    this.setupShaders()
+    this.setupShaders();
     this.setupPrimarySceneElements();
     this.configureGlowScene();
     this.setupFilmEffect();
@@ -254,7 +254,6 @@ var PlanetView = Backbone.View.extend({
     };
 
     this.materialNormalMap = new THREE.ShaderMaterial(parameters);
-
   },
 
   setupPrimarySceneElements: function() {
@@ -295,7 +294,6 @@ var PlanetView = Backbone.View.extend({
     this.group.add(this.clouds);
 
     this.scene.add(this.group);
-
   },
 
   configureGlowScene: function(){
@@ -318,7 +316,6 @@ var PlanetView = Backbone.View.extend({
     atmosphere.castShadow = true;
 
     this.glowscene.add(atmosphere);
-
   },
 
   setupFilmEffect: function(){
@@ -330,7 +327,6 @@ var PlanetView = Backbone.View.extend({
     this.composer = new THREE.EffectComposer(this.renderer);
     this.composer.addPass(this.renderModel);
     this.composer.addPass(this.effectFilm);
-
   },
 
   //NOTE: what does this do?
@@ -351,7 +347,6 @@ var PlanetView = Backbone.View.extend({
     //NOTE: what does this do?
     mouse2D = new THREE.Vector3(0, 10000, 0.5);
     ray = new THREE.Ray(this.camera.position, null);
-
   },
 
   addLights: function() {
@@ -372,7 +367,6 @@ var PlanetView = Backbone.View.extend({
     // add optional light params
     directional.position.set( 1, 0, 1).normalize();
     directional.target.position.copy(this.scene.position);
-
   },
 
   addStars: function() {
@@ -425,7 +419,6 @@ var PlanetView = Backbone.View.extend({
 
       this.scene.add(stars);
     }
-
   },
   //NOTE: figure out which of these are needed
   addControls: function() {
@@ -442,7 +435,6 @@ var PlanetView = Backbone.View.extend({
     this.controls.keys = [65, 83, 68];
 
     this.controls.addEventListener('change', this.render);
-
   },
 
   resize: function() {

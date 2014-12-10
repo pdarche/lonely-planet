@@ -98,7 +98,6 @@ var TweetsView = Backbone.View.extend({
         tweet.find('textarea').val('Reply posted!')
       }
     });
-
   },
 
   cookieCutter: function(cookie){
@@ -111,7 +110,6 @@ var TweetsView = Backbone.View.extend({
         result[cur[0]] = cur[1];
     }
     return result
-
   },
 
   toggleTweets: function() {

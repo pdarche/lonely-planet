@@ -2,7 +2,7 @@ $(document).ready(function(){
   var tweetsView, tweetsCollection
     , planetView, auidoView
     , controlsView, socket;
-  
+
   // event delegator for inter-view event handling
   vent = _.extend({}, Backbone.Events);
   // socket connection to the server
@@ -25,17 +25,17 @@ $(document).ready(function(){
   });
 
   vent.on('toggleTweets', function(msg){
-    tweetsView.toggleTweets()
-  })
+    tweetsView.toggleTweets();
+  });
 
   vent.on('toggleControls', function(bool){
-    planetView.controls.enabled = bool
-  })
+    planetView.controls.enabled = bool;
+  });
 
   vent.on('updateFollowerCount', function(count){
     tweetsView.followerCount = count;
     planetView.followerCount = count;
-  })
+  });
   // on message, create a new tweetModel
   // and add it tweet to the collection
   socket.onmessage = function(ev){
@@ -44,6 +44,6 @@ $(document).ready(function(){
 
     tweetsCollection.add(tweetModel);
   }
-  
+
   socket.onmessage();
 });
