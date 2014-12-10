@@ -6,6 +6,7 @@ import tornado.httpserver
 import tornado.httputil
 import tornado.auth
 import tornado.httpclient
+import tornado.gen
 from tornado import websocket
 
 import twitstream
@@ -46,7 +47,16 @@ def handle_request(response, status):
                 socket.write_message(status)
 
 
+def save_tweet(status):
+    """ """
+
+@tornado.gen.coroutine
 def tweet_callback(status):
+    """
+    Callback fired on data from the Twitter streaming API
+
+    """
+
     dstk_base = 'http://www.datasciencetoolkit.org/maps/api/geocode/json'
     dstk_tail = 'sensor=false'
     try:
@@ -75,8 +85,8 @@ def tweet_callback(status):
 
         if GLOBALS['sockets']:
             http_client = tornado.httpclient.AsyncHTTPClient()
-            http_client.fetch(url,
-                lambda response: handle_request(response, status))
+            response = yield http_client.fetch(url)
+            handle_request(response, status)
 
     except:
         pass
