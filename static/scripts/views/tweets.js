@@ -34,10 +34,9 @@ var TweetsView = Backbone.View.extend({
       , html = tmpl({"tweet":tweet.toJSON(), "cid": tweet.cid});
 
     if (this.prepend && tweet.get('user').followers_count <= this.followerCount){
-      this.$el.prepend(html);
-      this.$el.find('.tweet').eq(0).hide()
+      this.$el.prepend(html).delay(500)
         .queue(function(){
-          $(this).fadeIn('slow');
+          $(this).find('.tweet').eq(0).removeClass('hidden-tweet');
           $(this).dequeue();
         });
     }

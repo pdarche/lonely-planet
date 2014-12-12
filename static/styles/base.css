@@ -1,5 +1,4 @@
-body
-{
+body {
 	margin: 0;
 	background-color: #000;
 	padding: 0;
@@ -14,7 +13,7 @@ body
 	width: 350px;
 	/*height: 900px;*/
 	height:100%;
-	background-color: rgba(255,255,255, .2);
+	background-color: rgba(255,255,255, .1);
 	display:inline-block;
 	z-index: 1000;
 	/*border-right:1px solid white;*/
@@ -33,15 +32,15 @@ body
 }
 
 .tweet{
-	background-color:rgba(255,255,255,.4);
-	display:inline-block;
+	background-color: rgba(255,255,255,.4);
+	display: inline-block;
 	margin: 10px 10px 0px 15px;
-	position:relative;
-	padding:10px;
-	width:300px;
-	-webkit-border-radius:5px;
+	position: relative;
+	padding: 10px;
+	width: 300px;
+	opacity: 1;
+	-webkit-border-radius: 5px;
 	-webkit-transition: all .5s;
-
 }
 
 .tweet:hover{
@@ -112,7 +111,6 @@ h1{
 	display: block;
 	font-size:16px;
 	margin: 15px 5px 10px 5px;
-
 	text-align:center;
 }
 
@@ -128,11 +126,18 @@ h1{
 
 .hidden-tweets{
 	left:-350px;
-	-webkit-transition: all .25s;	
+	-webkit-transition: all .25s;
+}
+
+.tweet.hidden-tweet {
+	position: absolute;
+	top: -300px;
+	opacity: 0;
+	-webkit-transition: all 2s;
 }
 
 #controls{
-	background-color: rgba(255,255,255, .2);
+	background-color: rgba(255,255,255, .1);
 	float:right;
 	height:100%;
 	width:195px;
@@ -276,14 +281,14 @@ h1{
 	width:400px;
 	padding:1px;
 	-webkit-border-radius: 5px;
-} 
+}
 
 #tw_container h2{
 	position: relative;
 	text-align: center;
 }
 
-#tw_wrapper{	
+#tw_wrapper{
 	display:block;
 	width: 320px;
 	height: 160px;
