@@ -89,7 +89,7 @@ h1{
 	font-size:45px;
 	width:300px;
 	color:gray;
-	font-family: helvetica;
+	font-family: "HelveticaNeueW01-Thin", "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-align:center;
 	margin:0px auto;
 	font-weight:300;
@@ -248,7 +248,7 @@ h1{
 	width:20px;
 	margin:0px;
 	margin-top:70%;
-	background-color: rgba(255,255,255, .2);
+	background-color: rgba(255,255,255, .1);
 	z-index:200;
 	-webkit-border-radius:5px 0px 0px 5px;
 }
