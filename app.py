@@ -40,6 +40,7 @@ else:
         raise NotImplementedError("Unknown method: %s" % method)
 
 def handle_request(response, status):
+    """ Pushes the tweet to connected clients """
     if response.error:
         print "Error:", response.error
     else:
@@ -48,7 +49,6 @@ def handle_request(response, status):
             status['lp_geo'] = res['results'][0]
             for socket in GLOBALS['sockets']:
                 socket.write_message(status)
-
 
 def insert_tweet(status):
     """ Inserts tweet into Mongo"""
@@ -63,37 +63,42 @@ def add_tweet_reply(tweet_id, user, text):
     return db.tweets.update(
         {'id_str': tweet_id}, {'$push': {'replies': reply}}, True)
 
-@tornado.gen.coroutine
-def tweet_callback(status):
-    """
-    Callback fired on data from the Twitter streaming API
-
-    """
-
+def create_geo_url(status):
     dstk_base = 'http://www.datasciencetoolkit.org/maps/api/geocode/json'
     dstk_tail = 'sensor=false'
+    coordinates = filter(bool,[status['geo'], status['coordinates']])
+    if coordinates:
+        lat = coords['coordinates'][0]
+        lon = coords['coordinates'][1]
+        url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail)
+
+    elif status['place']:
+        split = status['place']['full_name'].split(', ')
+        city = split[0]
+        state = split[1]
+        country = status['place']['country']
+        url = "%s?%s,+%s,+%s&%s" % (dstk_base, city, state, country, dstk_tail)
+
+    elif status['user']['location']:
+        location = status['user']['location']
+        url = "%s?address=%s&%s" % (dstk_base, location, dstk_tail)
+        url = re.sub('\s+', '+', url)
+        url = re.sub(',', '+', url)
+
+    else:
+        return None
+
+    return url
+
+@tornado.gen.coroutine
+def tweet_callback(status):
+    """Callback fired on data from the Twitter streaming API"""
+
     try:
         status = json.loads(status)
-        coordinates = filter(bool,[status['geo'], status['coordinates']])
-        if coordinates:
-            lat = coords['coordinates'][0]
-            lon = coords['coordinates'][1]
-            url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail)
+        url = create_geo_url(status)
 
-        elif status['place']:
-            split = status['place']['full_name'].split(', ')
-            city = split[0]
-            state = split[1]
-            country = status['place']['country']
-            url = "%s?%s,+%s,+%s&%s" % (dstk_base, city, state, country, dstk_tail)
-
-        elif status['user']['location']:
-            location = status['user']['location']
-            url = "%s?address=%s&%s" % (dstk_base, location, dstk_tail)
-            url = re.sub('\s+', '+', url)
-            url = re.sub(',', '+', url)
-
-        else:
+        if status['text'].startswith('RT') or not url:
             return
 
         if GLOBALS['sockets']:

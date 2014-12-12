@@ -7,28 +7,29 @@ var AudioView =  Backbone.View.extend({
 
     this.basePath = "static/media/audio/";
     // song filenames
-    this.songPaths = [ 
-      "mad_world.mp3", "nothing_compares.mp3", "one_more_try.mp3", 
-      "miss_misery.mp3", "nutshell.mp3", 
+    this.songPaths = [
+      "mad_world.mp3", "nothing_compares.mp3", "one_more_try.mp3",
+      "miss_misery.mp3", "nutshell.mp3",
       "no_surprises.mp3", "hide_and_seek.mp3",
       "i_know_its_over.mp3"
     ];
     // song titles
     this.songNames = [
       "Gary Jules - Mad World" , "Sinead O'Connor - Nothing Compares",
-      "George Michael - One More Try", "Elliot Smith - Miss Misery", 
-      "Alice In Chains - Nutshell", "Radiohead - No Surprises", 
+      "George Michael - One More Try", "Elliot Smith - Miss Misery",
+      "Alice In Chains - Nutshell", "Radiohead - No Surprises",
       "Imogen Heap - Hide and Seek", "The Smiths - I Know It's Over"
     ];
     // song index
-    this.songIndex = 0;
-    
+    this.songIndex = Math.floor(Math.random() * 7);
+
     // load and render the template
     $.when($.get('/static/scripts/templates/audioControls.Handlebars'))
      .done(function(tmpl){
       self.tmpl = tmpl;
       self.render();
       self.audioPlayer = document.getElementById('audio_player')
+      self.audioPlayer.src = self.basePath + self.songPaths[self.songIndex]
       self.audioPlayer.play();
       self.updateSongTitle();
 
@@ -44,7 +45,7 @@ var AudioView =  Backbone.View.extend({
       , tmpl   = Handlebars.compile(source)
       , html   = tmpl;
 
-    this.$el.append(html);    
+    this.$el.append(html);
   },
 
   events: {
@@ -68,16 +69,16 @@ var AudioView =  Backbone.View.extend({
     $(ev.target).addClass('active-audio');
 
   },
-  
+
   play : function(){
     this.audioPlayer.play();
     this.updateSongTitle();
   },
   pause: function(){
     this.audioPlayer.pause();
-    this.updateSongTitle(); 
+    this.updateSongTitle();
   },
-  
+
   forward: function(){
     this.songIndex !== 7 ? this.songIndex++ : this.songIndex = 0;
     this.audioPlayer.src = this.basePath + this.songPaths[this.songIndex]
