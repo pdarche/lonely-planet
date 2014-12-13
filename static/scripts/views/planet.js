@@ -137,8 +137,8 @@ var PlanetView = Backbone.View.extend({
   loop: function() {
     var self = this;
 
-    this.group.rotation.y += (0.02).degreesToRadians();
-    this.clouds.rotation.y += (0.01).degreesToRadians();
+    this.earth.rotation.y += (0.01).degreesToRadians();
+    this.clouds.rotation.y += (0.02).degreesToRadians();
 
     TWEEN.update();
 
@@ -282,10 +282,10 @@ var PlanetView = Backbone.View.extend({
   },
 
   setupPrimarySceneElements: function() {
-    var earthRadius, earth, clouds;
+    var earth;
 
     this.earthRadius = 90;
-    earth = new THREE.Mesh(
+    this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(this.earthRadius, 64, 64),
       new THREE.MeshPhongMaterial({
         map: this.planetTexture,  //THREE.ImageUtils.loadTexture( 'static/media/good-earth/small-map.jpg' ),
@@ -300,10 +300,10 @@ var PlanetView = Backbone.View.extend({
       })
     );
 
-    earth.position.set(0, 0, 0);
-    earth.receiveShadow = true;
-    earth.castShadow = true;
-    this.group.add(earth);
+    this.earth.position.set(0, 0, 0);
+    this.earth.receiveShadow = true;
+    this.earth.castShadow = true;
+    this.group.add(this.earth);
 
     this.clouds = new THREE.Mesh(
       new THREE.SphereGeometry(this.earthRadius + 2, 32, 32),
