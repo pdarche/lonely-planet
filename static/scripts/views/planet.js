@@ -20,9 +20,20 @@ var PlanetView = Backbone.View.extend({
     this.target = {x: 0, y: 200, z: 250};
     this.tween = new TWEEN.Tween(this.position)
                             .to(this.target, 8000);
-    this.mousedown = false;
+    // this.mousedown = false;
+    // this.mouseX = 0;
+    // this.mouseY = 0;
+
+    this.targetRotationX = 0;
+    this.targetRotationOnMouseDownX = 0;
+    this.targetRotationY = 0;
+    this.targetRotationOnMouseDownY = 0;
     this.mouseX = 0;
+    this.mouseXOnMouseDown = 0;
     this.mouseY = 0;
+    this.mouseYOnMouseDown = 0;
+    this.windowHalfX = window.innerWidth / 2;
+    this.windowHalfY = window.innerHeight / 2;
 
     _.bindAll(this, 'setupScene', 'setupGlowScene',
       'setupRenderer', 'setupTextures', 'setupShaders',
@@ -30,7 +41,7 @@ var PlanetView = Backbone.View.extend({
       'setupFilmEffect', 'setupProjector', 'setupTween',
       'addLights', 'addStars', 'addControls', 'loop',
       'render', 'resize', 'onMouseMove', 'onMouseDown',
-      'onMouseUp', 'newTweet', 'rotateScene', 'uAreHere'
+      'onMouseUp', 'newTweet', 'uAreHere'
     );
 
     // setup the scene
@@ -67,6 +78,20 @@ var PlanetView = Backbone.View.extend({
   render: function() {
     var delta = this.clock.getDelta();
 
+    this.group.rotation.y += (this.targetRotationX - this.group.rotation.y) * 0.1;
+    this.finalRotationY = (this.targetRotationY - this.group.rotation.x);
+
+    if (this.group.rotation.x  <= 1 && this.group.rotation.x >= -1) {
+        this.group.rotation.x += this.finalRotationY * 0.1;
+    }
+    if (this.group.rotation.x > 1) {
+        this.group.rotation.x = 1
+    }
+
+    if (this.group.rotation.x < -1) {
+        this.group.rotation.x = -1
+    }
+
     this.camera.lookAt(this.scene.position);
     this.renderer.render(this.scene, this.camera);
     // glowcomposer.render(0.1);
@@ -82,31 +107,31 @@ var PlanetView = Backbone.View.extend({
         return;
     }
 
-    var deltaX = ev.clientX - this.mouseX
-      , deltaY = ev.clientY - this.mouseY;
+    this.mouseX = ev.clientX - this.windowHalfX;
+    this.mouseY = ev.clientY - this.windowHalfY;
 
-    this.mouseX = ev.clientX;
-    this.mouseY = ev.clientY;
-    this.rotateScene(deltaX, deltaY);
+    this.targetRotationY = this.targetRotationOnMouseDownY + (this.mouseY - this.mouseYOnMouseDown) * 0.02;
+    this.targetRotationX = this.targetRotationOnMouseDownX + (this.mouseX - this.mouseXOnMouseDown) * 0.02;
+
   },
 
   onMouseDown: function(ev) {
     ev.preventDefault();
 
     this.mouseDown = true;
-    this.mouseX = ev.clientX;
-    this.mouseY = ev.clientY;
+    // this.mouseX = ev.clientX;
+    // this.mouseY = ev.clientY;
+    this.mouseXOnMouseDown = ev.clientX - this.windowHalfX;
+    this.targetRotationOnMouseDownX = this.targetRotationX;
+
+    this.mouseYOnMouseDown = ev.clientY - this.windowHalfY;
+    this.targetRotationOnMouseDownY = this.targetRotationY;
   },
 
   onMouseUp: function(ev) {
     ev.preventDefault();
 
     this.mouseDown = false;
-  },
-
-  rotateScene: function(deltaX, deltaY){
-    this.group.rotation.y += deltaX / 100;
-    this.group.rotation.x += deltaY / 100;
   },
 
   loop: function() {
