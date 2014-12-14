@@ -1,46 +1,49 @@
-<html> 
+<html>
 <head>
-	<title>Lonely Planet</title> 
-	<link rel="stylesheet" type="text/css" href="static/styles/home.css" />
-	<script src="http://d3js.org/d3.v2.js"></script>
+  <title>Lonely Planet</title>
+  <link rel="stylesheet" type="text/css" href="static/styles/home.css" />
+  <script src="http://d3js.org/d3.v2.js"></script>
+  <script charset="utf-8" src="static/scripts/vendor/jquery.js"></script>
 </head>
 <body>
-	<svg></svg>
-	<h1>Lonely Planet</h1>
-	<h2>connect to twitter to respond to tweets</h2>
-	<div id="buttons">		
-		<div class="button">
-			<a href="/login">Connect</a>
-		</div> 
-		<div class="button">
-			<a href="/planet">No thanks</a>
-		</div>
-	</div>
-	<script>
-		var stars = []
-		for ( var i = 0; i < 500; i++){
-			var x = Math.random() * window.innerWidth,
-				y = Math.random() * window.innerHeight,
-				r = Math.random() * 2,
-				pos = { 
-					"x" : x, 
-					"y" : y, 
-					"r" : r 
-				}
-				stars.push(pos)
-		}
+  <svg></svg>
+  <div id="title_group">
+    <h1>Lonely Planet</h1>
+    <h2>connect to twitter to respond to tweets</h2>
+    <div id="buttons">
+      <div class="button">
+        <a href="/login">Connect</a>
+      </div>
+      <div class="button">
+        <a id="no_thanks" href="/planet">No thanks</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    var stars = []
+    for (var i = 0; i < 900; i++){
+      var x = Math.random() * window.innerWidth
+        , y = Math.random() * window.innerHeight
+        , r = Math.random() * 2
+        pos = {
+          "x" : x,
+          "y" : y,
+          "r" : r
+        }
+        stars.push(pos)
+    }
 
-		d3.select('svg').selectAll('circle')
-			  .data(stars)
-			.enter()
-			  .append('circle')
-		  		.attr("class", "star")
-			  	.attr("cx", function(d){ return d.x } )
-			  	.attr("cy", function(d){ return d.y } )
-			  	.attr("r", function(d){ return d.r } )
-			  	.style("fill", "#fff")
-			  	.style("opacity", function(){ return Math.random() * .5})
+    d3.select('svg').selectAll('circle')
+        .data(stars)
+      .enter()
+        .append('circle')
+          .attr("class", "star")
+          .attr("cx", function(d){ return d.x } )
+          .attr("cy", function(d){ return d.y } )
+          .attr("r", function(d){ return d.r } )
+          .style("fill", "#fff")
+          .style("opacity", function(){ return Math.random() * .5})
 
-	</script>
-</body> 
+  </script>
+</body>
 </html>

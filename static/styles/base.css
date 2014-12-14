@@ -3,7 +3,7 @@ body {
 	background-color: #000;
 	padding: 0;
 	font-family: "Lucida Grande", Geneva, Verdana, Arial, sans-serif;
-	font-size:   12px;
+	font-size: 12px;
 	line-height: 20px;
 	overflow: hidden;
 }
@@ -11,12 +11,10 @@ body {
 #nav{
 	position:absolute;
 	width: 350px;
-	/*height: 900px;*/
 	height:100%;
 	background-color: rgba(255,255,255, .1);
 	display:inline-block;
 	z-index: 1000;
-	/*border-right:1px solid white;*/
 }
 
 .img {
@@ -84,7 +82,7 @@ body {
 	color:black;
 }
 
-h1{
+h1 {
 	line-height: 200%;
 	font-size:45px;
 	width:300px;
@@ -92,9 +90,8 @@ h1{
 	font-family: "HelveticaNeueW01-Thin", "Helvetica Neue", Arial, Helvetica, sans-serif;
 	text-align:center;
 	margin:0px auto;
-	font-weight:300;
-	letter-spacing: -2px;
-	border-bottom:1px solid gray;
+	font-weight: 100;
+	letter-spacing: 1px;
 }
 
 #control_panel{
