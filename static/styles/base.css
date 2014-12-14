@@ -96,10 +96,12 @@ h1 {
 
 #control_panel{
 	position:relative;
+	top: 50%;
+  	transform: translateY(50%);
 	float:right;
 	width:215px;
 	height:370px;
-	margin:15% 0px;
+	/*margin:15% 0px;*/
 	color:gray;
 }
 
@@ -173,6 +175,8 @@ h1 {
 
 .option:hover {
 	cursor:pointer;
+	border: 1px solid white;
+	color: white;
 }
 
 .option-wrapper .option-one {
@@ -204,6 +208,8 @@ h1 {
 
 .audio-control:hover{
 	cursor:pointer;
+	border: 1px solid white;
+	color: white;
 }
 
 .active, .active-audio {
