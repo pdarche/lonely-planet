@@ -18,7 +18,7 @@ var PlanetView = Backbone.View.extend({
     this.NEAR = 0.1;
     this.FAR = 10000;
     this.position = {x: 0, y: 0, z: 1200};
-    this.target = {x: 0, y: 200, z: 250};
+    this.target = {x: 0, y: 200, z: 200};
     this.tween = new TWEEN.Tween(this.position)
                             .to(this.target, 8000);
 
