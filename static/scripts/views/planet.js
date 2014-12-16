@@ -70,7 +70,6 @@ var PlanetView = Backbone.View.extend({
 
     // bind new tweet event to the collection
     this.collection.bind('add', this.newTweet);
-
   },
 
   render: function() {

@@ -1,7 +1,8 @@
 $(document).ready(function(){
   var tweetsView, tweetsCollection
     , planetView, auidoView
-    , controlsView, socket;
+    , controlsView, infoView
+    , socket;
 
   // event delegator for inter-view event handling
   vent = _.extend({}, Backbone.Events);
@@ -22,6 +23,10 @@ $(document).ready(function(){
   // controls view
   auidoView = new AudioView({
     el: '#control_panel'
+  });
+
+  infoView = new InfoView({
+    el: '#info'
   });
 
   vent.on('toggleTweets', function(msg){
