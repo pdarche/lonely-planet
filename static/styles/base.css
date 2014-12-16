@@ -8,6 +8,16 @@ body {
 	overflow: hidden;
 }
 
+#info {
+	position: absolute;
+	top: 10px;
+	right: 40px;
+	width: 30px;
+	height: 30px;
+	border-radius: 15px;
+	border: 1px solid gray;
+}
+
 #nav{
 	position:absolute;
 	width: 350px;
