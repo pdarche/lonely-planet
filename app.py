@@ -97,8 +97,9 @@ def tweet_callback(status):
     try:
         status = json.loads(status)
         url = create_geo_url(status)
+        text = status['text']
 
-        if status['text'].startswith('RT') or not url:
+        if text.startswith('RT') or not url or 'http' in text:
             return
 
         if GLOBALS['sockets']:
