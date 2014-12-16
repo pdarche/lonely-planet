@@ -182,7 +182,10 @@ var PlanetView = Backbone.View.extend({
       , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet)
       , distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
 
-    console.log('location', tweet.get('lp_geo'))
+    var geo = tweet.get('lp_geo')
+    if (geo.address_components[0].long_name.length <= 4){
+      console.log('small geo', geo)
+    }
 
     if (this.userLat){
       tweet.set('dist_from_user', distFromUser);

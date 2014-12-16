@@ -41,7 +41,7 @@ body {
 
 .tweet-wrapper{
 	display:inline-block;
-	max-width: 240px;
+	width: 240px;
 }
 
 .location {
@@ -60,7 +60,8 @@ body {
 	display: inline-block;
 	color:black;
 	float: left;
-	max-width: 100px;
+	max-width: 120px;
+	height: 20px;
 	overflow: hidden;
 }
 
