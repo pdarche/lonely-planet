@@ -4,6 +4,7 @@ var PlanetView = Backbone.View.extend({
   initialize: function(){
     var self = this;
     // NOTE: review to see which of these are used!
+    this.userPin = undefined;
     this.pins = [];
     this.WIDTH = window.innerWidth;
     this.HEIGHT = window.innerHeight;
@@ -20,9 +21,6 @@ var PlanetView = Backbone.View.extend({
     this.target = {x: 0, y: 200, z: 250};
     this.tween = new TWEEN.Tween(this.position)
                             .to(this.target, 8000);
-    // this.mousedown = false;
-    // this.mouseX = 0;
-    // this.mouseY = 0;
 
     this.targetRotationX = 0;
     this.targetRotationOnMouseDownX = 0;
@@ -61,7 +59,7 @@ var PlanetView = Backbone.View.extend({
     // add the scene elements and start rendering
     this.addLights();
     this.addStars();
-    this.addControls();
+    // this.addControls();
     this.loop();
 
     //bind resize, mousemove events
@@ -78,6 +76,7 @@ var PlanetView = Backbone.View.extend({
   render: function() {
     var delta = this.clock.getDelta();
 
+    this.targetRotationX += (0.01).degreesToRadians();
     this.group.rotation.y += (this.targetRotationX - this.group.rotation.y) * 0.1;
     this.finalRotationY = (this.targetRotationY - this.group.rotation.x);
 
@@ -87,7 +86,6 @@ var PlanetView = Backbone.View.extend({
     if (this.group.rotation.x > 1) {
         this.group.rotation.x = 1
     }
-
     if (this.group.rotation.x < -1) {
         this.group.rotation.x = -1
     }
@@ -110,8 +108,8 @@ var PlanetView = Backbone.View.extend({
     this.mouseX = ev.clientX - this.windowHalfX;
     this.mouseY = ev.clientY - this.windowHalfY;
 
-    this.targetRotationY = this.targetRotationOnMouseDownY + (this.mouseY - this.mouseYOnMouseDown) * 0.02;
-    this.targetRotationX = this.targetRotationOnMouseDownX + (this.mouseX - this.mouseXOnMouseDown) * 0.02;
+    this.targetRotationY = this.targetRotationOnMouseDownY + (this.mouseY - this.mouseYOnMouseDown) * 0.01;
+    this.targetRotationX = this.targetRotationOnMouseDownX + (this.mouseX - this.mouseXOnMouseDown) * 0.01;
 
   },
 
@@ -119,8 +117,7 @@ var PlanetView = Backbone.View.extend({
     ev.preventDefault();
 
     this.mouseDown = true;
-    // this.mouseX = ev.clientX;
-    // this.mouseY = ev.clientY;
+
     this.mouseXOnMouseDown = ev.clientX - this.windowHalfX;
     this.targetRotationOnMouseDownX = this.targetRotationX;
 
@@ -137,36 +134,36 @@ var PlanetView = Backbone.View.extend({
   loop: function() {
     var self = this;
 
-    this.earth.rotation.y += (0.01).degreesToRadians();
-    this.clouds.rotation.y += (0.02).degreesToRadians();
-
+    this.clouds.rotation.y += (0.01).degreesToRadians();
     TWEEN.update();
 
     if (this.pins.length > 0) {
       $.each(this.pins, function(i){
-        if (self.pins[i].dead){
+        var pin = self.pins[i]
+        if (pin.dead){
           // this.pins[i].children[0].children[1].visible = false;
           // scene.remove(scene.__objects[i + 2]);
           // delete pins[i].children[0].children[1];
           // renderer.deallocateObject(pins[i].children[0].children[1]);
         } else {
-          self.pins[i].fadeMarker();
-          self.pins[i].fadeIndicator();
-          self.pins[i].spike();
+          pin.fadeMarker();
+          pin.fadeIndicator();
+          pin.spike();
         }
       });
     }
 
     requestAnimationFrame(this.loop);
     this.render();
-    this.controls.update();
+    // this.controls.update();
   },
 
   uAreHere: function(x, y){
     var userPin = this.dropPin(Number(x), Number(y), 0xFFFFFF);
 
-    this.userLat = Number(x)
-    this.userLng = Number(y)
+    this.userLat = Number(x);
+    this.userLng = Number(y);
+    this.userPin = userPin;
 
     this.group.add(userPin);
   },
@@ -469,24 +466,24 @@ var PlanetView = Backbone.View.extend({
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   },
 
-  //NOTE: this will likely
-  mouseMove: function(ev) {
-    ev.preventDefault();
-    mouse2D.x = (ev.clientX / window.innerWidth) * 2 - 1;
-    mouse2D.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+  //NOTE: this is not being used
+  // mouseMove: function(ev) {
+  //   ev.preventDefault();
+  //   mouse2D.x = (ev.clientX / window.innerWidth) * 2 - 1;
+  //   mouse2D.y = -(ev.clientY / window.innerHeight) * 2 + 1;
 
-    mouse3D = this.projector.unprojectVector(mouse2D.clone(), this.camera);
-    ray.direction = mouse3D.subSelf(this.camera.position).normalize();
+  //   mouse3D = this.projector.unprojectVector(mouse2D.clone(), this.camera);
+  //   ray.direction = mouse3D.subSelf(this.camera.position).normalize();
 
-    var intersects = ray.intersectObjects(this.scene.children);
+  //   var intersects = ray.intersectObjects(this.scene.children);
 
-    // mouseover stuff to see if the mose is intersecting a tweet
-    if (intersects.length > 0) {
-      // if ( ROLLOVERED ) ROLLOVERED.color.setHex( 0x00ff80 );
-      ROLLOVERED = intersects;
-      // console.log( intersects )
-    }
-  },
+  //   // mouseover stuff to see if the mose is intersecting a tweet
+  //   if (intersects.length > 0) {
+  //     // if ( ROLLOVERED ) ROLLOVERED.color.setHex( 0x00ff80 );
+  //     ROLLOVERED = intersects;
+  //     // console.log( intersects )
+  //   }
+  // },
 
   dropPin: function(latitude, longitude, color, tweet) {
     var group1, group2, marker, markerLength, indicator;
