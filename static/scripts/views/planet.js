@@ -137,7 +137,7 @@ var PlanetView = Backbone.View.extend({
     this.clouds.rotation.y += (0.01).degreesToRadians();
     TWEEN.update();
 
-    if (this.pins.length > 0) {
+    if (this.pins) {
       $.each(this.pins, function(i){
         var pin = self.pins[i]
         if (pin.dead){
@@ -181,6 +181,8 @@ var PlanetView = Backbone.View.extend({
       , lng = tweet.get('lp_geo').geometry.location.lng
       , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet)
       , distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
+
+    console.log('location', tweet.get('lp_geo'))
 
     if (this.userLat){
       tweet.set('dist_from_user', distFromUser);

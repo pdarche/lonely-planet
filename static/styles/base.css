@@ -23,12 +23,6 @@ body {
 	margin-right:10px;
 }
 
-.tweet-wrapper{
-	display:inline-block;
-	float:left;
-	max-width: 240px;
-}
-
 .tweet{
 	background-color: rgba(255,255,255,.4);
 	display: inline-block;
@@ -45,9 +39,29 @@ body {
 	background-color:rgba(255,255,255,.7);
 }
 
+.tweet-wrapper{
+	display:inline-block;
+	max-width: 240px;
+}
+
 .location {
+	display: inline-block;;
 	font-size: 10px;
-	float:right;
+	text-align: right;
+	float: right;
+}
+
+.user-name{
+	font-weight:bold;
+	height: 20px;
+}
+
+.user-name a {
+	display: inline-block;
+	color:black;
+	float: left;
+	max-width: 100px;
+	overflow: hidden;
 }
 
 .followers{
@@ -72,15 +86,9 @@ body {
 .reply-button{
 	display:block;
 	float:right;
+	margin-top: 5px;
 }
 
-.user-name{
-	font-weight:bold;
-}
-
-.user-name a{
-	color:black;
-}
 
 h1 {
 	line-height: 200%;

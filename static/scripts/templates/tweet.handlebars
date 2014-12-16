@@ -5,14 +5,14 @@
 		</div>
 		<div class="tweet-wrapper">
 			<div class="user-name">
-				<a href="http://twitter.com/{{tweet.user.screen_name}}" Target="_blank"> {{tweet.user.name}} </a>
-				<span class="location"> {{tweet.lp_geo.address_components.0.long_name}} </span>
+				<a href="http://twitter.com/{{tweet.user.screen_name}}" Target="_blank"> {{tweet.user.name}}</a>
+				<div class="location"> {{tweet.lp_geo.address_components.0.long_name}} </div>
 			</div>
 			<div class="followers">followers: {{tweet.user.followers_count}} </div>
 			<div class="tweet-text"> {{tweet.text}} </div>
 		</div>
 		<div class="reply">
-			<textarea cols="40" rows="6" class="reply-input" placeholder="reply to @{{tweet.user.screen_name}}"></textarea>
+			<textarea cols="40" rows="5" class="reply-input" placeholder="reply to @{{tweet.user.screen_name}}"></textarea>
 			<button class="reply-button">tweet</button>
 		</div>
 	</div>
