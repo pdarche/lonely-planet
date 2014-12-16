@@ -114,6 +114,9 @@ def tweet_callback(status):
 
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
+        if self.get_secure_cookie('oauth_token'):
+            self.redirect('/planet')
+
         self.render('index.html')
 
 
