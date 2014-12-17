@@ -1,35 +1,35 @@
 var app = app || {};
 
-// app.cookieCutter = function(cookie){
-//   var result = {}
-//     , str;
+app.cookieCutter = function(cookie){
+  var result = {}
+    , str;
 
-//   str = cookie.split('; ');
-//   for (var i = 0; i < str.length; i++) {
-//       var cur = str[i].split('=');
-//       result[cur[0]] = cur[1];
-//   }
-//   return result
-// }
+  str = cookie.split('; ');
+  for (var i = 0; i < str.length; i++) {
+      var cur = str[i].split('=');
+      result[cur[0]] = cur[1];
+  }
+  return result
+}
 
-// app.cookieCuller = function(name) {
-//   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-// };
+app.cookieCuller = function(name) {
+  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
 
-// app.setAuthenticated = function(){
-//   cookieKeys = this.cookieCutter(document.cookie)
-//   cookieKeys = Object.keys(cookieKeys)
+app.setAuthenticated = function(){
+  cookieKeys = this.cookieCutter(document.cookie)
+  cookieKeys = Object.keys(cookieKeys)
 
-//   if (_.indexOf(cookieKeys, "oauth_token") !== -1){
-//     this.authenticated = true;
-//   } else {
-//     this.authenticated = false;
-//   }
-// }
+  if (_.indexOf(cookieKeys, "oauth_token") !== -1){
+    this.authenticated = true;
+  } else {
+    this.authenticated = false;
+  }
+}
 
-// app.initialize = function(){
-//   this.setAuthenticated();
-// }
+app.initialize = function(){
+  this.setAuthenticated();
+}
 
 $(document).ready(function(){
   var tweetsView, tweetsCollection

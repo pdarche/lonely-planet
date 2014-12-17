@@ -1,12 +1,10 @@
 <script type="x-handlebars-template">
-	{{#if authenticated}}
-		<a id="logout" href="/logout">Log Out</div>
-	{{else}}
-		<a id="login" href="/login">Log In</div>
-	{{/if}}
+
 	<div id="icon">i</div>
 	<div id="additional_info" class="hide">
 		<div id="remove">X</div>
-		<p>Lonely Planet listens to the Twitter streaming api for mentions of the term Lonely.</p>
+		<div id="info_text">
+			<p>Lonely Planet listens to the Twitter streaming api for mentions of the term Lonely.</p>
+		</div>
 	</div>
 </script>
