@@ -1,10 +1,20 @@
 <script type="x-handlebars-template">
-
+	{{#if authenticated}}
+		<a id="logout" href="/logout">Disconnect Twitter</a>
+	{{else}}
+		<a id="login" href="/login">Connect Twitter</a>
+	{{/if}}
 	<div id="icon">i</div>
 	<div id="additional_info" class="hide">
 		<div id="remove">X</div>
 		<div id="info_text">
-			<p>Lonely Planet listens to the Twitter streaming api for mentions of the term Lonely.</p>
+			<p> Lonely Planet is an attempt to use real-time twitter data to see where the other lonely people are in the world.</p>
+
+			<p>It started off as an assignment for Stewart Smith's Visualizing JS class at NYU ITP.  In late 2014 I cleaned up the code and redeployed it.</p>
+
+			<p>A small python server listens to the Twitter streaming api for mentions of the term 'lonely'.  When a lonely tweet is found, it's processed and sent out to all of the connected clients.  If the tweet contains links, or starts with an RT, it's discarded.  If it contains location information that info is passed through the Data Science Toolkit geocoder and added to the tweet. Finally, the tweet is stored in a database.</p>
+
+			<p> <strong>Data privacy note:</strong> User location data is not saved and is never communicated to the server.  If a user has connected twitter and replies to a tweet, the reply will be saved.</p>
 		</div>
 	</div>
 </script>

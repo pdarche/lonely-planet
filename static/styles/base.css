@@ -29,6 +29,23 @@ body {
 	width: 30%;
 }
 
+#login, #logout {
+	position: absolute;
+	top: 26px;
+	right: 90px;
+	font-size: 14px;
+	font-weight: 200;
+	font-family: "HelveticaNeueW01-Thin", "Helvetica Neue", Arial, Helvetica, sans-serif;
+	color: rgba(255,255,255,.3);
+	z-index: 10;
+	text-decoration: none;
+}
+
+#login:hover, #logout:hover {
+	cursor: pointer;
+	color: rgba(255,255,255,1);
+}
+
 #icon {
 	position: absolute;
 	top: 20px;

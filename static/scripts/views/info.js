@@ -25,16 +25,15 @@ app.InfoView = Backbone.View.extend({
   },
 
   toggleView: function(ev) {
-    var icon = this.$el.find('#icon')
+    var icon = this.$el.find('#icon, #login, #logout')
       , additionalInfo = this.$el.find('#additional_info');
 
     if (additionalInfo.hasClass('hide')) {
-      this.$el.find('#icon').addClass('hide');
-      this.$el.find('#additional_info').removeClass('hide');
-      console.log('doesnt have class!!!');
+      icon.addClass('hide');
+      additionalInfo.removeClass('hide');
     } else {
-      this.$el.find('#icon').removeClass('hide');
-      this.$el.find('#additional_info').addClass('hide');
+      icon.removeClass('hide');
+      additionalInfo.addClass('hide');
     }
   }
 })
