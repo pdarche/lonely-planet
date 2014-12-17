@@ -170,6 +170,15 @@ class TwitterHandler(tornado.web.RequestHandler,
         self.redirect('/planet')
 
 
+class LogoutHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.clear_cookie('user_id')
+        self.clear_cookie('oauth_token')
+        self.clear_cookie('oauth_secret')
+
+        self.redirect('/')
+
+
 class PostHandler(tornado.web.RequestHandler,
                     tornado.auth.TwitterMixin):
     @tornado.web.asynchronous
@@ -226,6 +235,7 @@ if __name__ == "__main__":
             (r"/", IndexHandler),
             (r"/planet", MainHandler),
             (r"/login", TwitterHandler),
+            (r"/logout", LogoutHandler),
             (r"/post/([0-9]+)", PostHandler),
             (r"/socket", ClientSocket),
             (r"/push", Announcer),

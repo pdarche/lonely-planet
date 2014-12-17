@@ -1,7 +1,6 @@
-// NOTE: Namespacing is good but is probably not needed
 var app = app || {};
 
-var TweetsView = Backbone.View.extend({
+app.TweetsView = Backbone.View.extend({
   initialize: function() {
     var self = this
       , cookieKeys;

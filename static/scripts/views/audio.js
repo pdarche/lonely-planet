@@ -1,7 +1,6 @@
-// NOTE: Namespacing is good but is probably not needed
 var app = app || {};
 
-var AudioView =  Backbone.View.extend({
+app.AudioView =  Backbone.View.extend({
   initialize: function() {
     var self = this;
 
@@ -61,19 +60,18 @@ var AudioView =  Backbone.View.extend({
 
   toggleControls: function(){
     $('#control_panel').toggleClass("shown", "hidden");
-
   },
 
   toggleActiveAudio: function(ev){
     $('.active-audio').removeClass('active-audio');
     $(ev.target).addClass('active-audio');
-
   },
 
   play : function(){
     this.audioPlayer.play();
     this.updateSongTitle();
   },
+
   pause: function(){
     this.audioPlayer.pause();
     this.updateSongTitle();
@@ -84,7 +82,6 @@ var AudioView =  Backbone.View.extend({
     this.audioPlayer.src = this.basePath + this.songPaths[this.songIndex]
     this.audioPlayer.play();
     this.updateSongTitle();
-
   },
 
   back: function(){
@@ -92,7 +89,6 @@ var AudioView =  Backbone.View.extend({
     this.audioPlayer.src = this.basePath + this.songPaths[this.songIndex]
     this.audioPlayer.play();
     this.updateSongTitle();
-
   },
 
   updateSongTitle: function(){

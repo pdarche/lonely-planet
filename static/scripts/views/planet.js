@@ -1,6 +1,6 @@
 var app = app || {};
 
-var PlanetView = Backbone.View.extend({
+app.PlanetView = Backbone.View.extend({
   initialize: function(){
     var self = this;
     // NOTE: review to see which of these are used!

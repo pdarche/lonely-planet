@@ -1,6 +1,6 @@
+var app = app || {};
 
-
-var InfoView = Backbone.View.extend({
+app.InfoView = Backbone.View.extend({
   initialize: function(){
     var self = this;
 
@@ -9,13 +9,13 @@ var InfoView = Backbone.View.extend({
       self.tmpl = tmpl;
       self.render()
      });
-     _.bindAll(this, 'render');
+    _.bindAll(this, 'render');
   },
 
   render: function() {
     var source = $(this.tmpl).html()
       , tmpl = Handlebars.compile(source)
-      , html = tmpl();
+      , html = tmpl({authenticated: app.authenticated});
 
     this.$el.append(html);
   },

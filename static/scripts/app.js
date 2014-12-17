@@ -1,31 +1,65 @@
+var app = app || {};
+
+// app.cookieCutter = function(cookie){
+//   var result = {}
+//     , str;
+
+//   str = cookie.split('; ');
+//   for (var i = 0; i < str.length; i++) {
+//       var cur = str[i].split('=');
+//       result[cur[0]] = cur[1];
+//   }
+//   return result
+// }
+
+// app.cookieCuller = function(name) {
+//   document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+// };
+
+// app.setAuthenticated = function(){
+//   cookieKeys = this.cookieCutter(document.cookie)
+//   cookieKeys = Object.keys(cookieKeys)
+
+//   if (_.indexOf(cookieKeys, "oauth_token") !== -1){
+//     this.authenticated = true;
+//   } else {
+//     this.authenticated = false;
+//   }
+// }
+
+// app.initialize = function(){
+//   this.setAuthenticated();
+// }
+
 $(document).ready(function(){
   var tweetsView, tweetsCollection
     , planetView, auidoView
     , controlsView, infoView
     , socket;
 
+  app.initialize();
   // event delegator for inter-view event handling
   vent = _.extend({}, Backbone.Events);
   // socket connection to the server
   socket = new WebSocket("ws://localhost:9000/socket");
   // the collection of tweets
-  tweetsCollection = new TweetsCollection();
+  tweetsCollection = new app.TweetsCollection();
   // The main three.js scene
-  planetView = new PlanetView({
+  planetView = new app.PlanetView({
     el: '#three',
     collection: tweetsCollection
   });
   // tweetsView
-  tweetsView = new TweetsView({
+  tweetsView = new app.TweetsView({
     el: '#tweets',
     collection: tweetsCollection
   });
   // controls view
-  auidoView = new AudioView({
+  auidoView = new app.AudioView({
     el: '#control_panel'
   });
 
-  infoView = new InfoView({
+  infoView = new app.InfoView({
     el: '#info'
   });
 
@@ -41,11 +75,13 @@ $(document).ready(function(){
     tweetsView.followerCount = count;
     planetView.followerCount = count;
   });
+
+
   // on message, create a new tweetModel
   // and add it tweet to the collection
   socket.onmessage = function(ev){
     var tweet = JSON.parse(ev.data)
-      , tweetModel = new TweetModel(tweet);
+      , tweetModel = new app.TweetModel(tweet);
 
     tweetsCollection.add(tweetModel);
   }

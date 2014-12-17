@@ -1,10 +1,7 @@
-// NOTE: Namespacing is good but is probably not needed
 var app = app || {};
 
-var TweetsCollection = Backbone.Collection.extend({
-  model: TweetModel,
+app.TweetsCollection = Backbone.Collection.extend({
+  model: app.TweetModel,
   url: '/post',
-  initialize: function(models){
-    
-  }
+  initialize: function(models){}
 });
