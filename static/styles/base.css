@@ -18,7 +18,7 @@ body {
 	background-color: rgba(255,255,255,.7);
 	color: rgba(50,50,50,1);
 	font-size: 16px;
-	z-index: 10;
+	z-index: 202;
 	-webkit-transition: opacity .25s ;
 }
 
@@ -90,7 +90,7 @@ body {
 	height:100%;
 	background-color: rgba(255,255,255, .1);
 	display:inline-block;
-	z-index: 998;
+	z-index: 200;
 }
 
 .img {
@@ -157,7 +157,7 @@ body {
 	border:1px solid gray;
 	border-radius:5px;
 	padding:10px;
-	z-index: 999;
+	z-index: 201;
 }
 
 .reply-button{
@@ -198,7 +198,7 @@ h1 {
 	text-align:center;
 }
 
-#additional_info.hide {
+#icon.hide, #additional_info.hide {
 	z-index: 0;
 	opacity: 0;
 	-webkit-transition: all .25s;
