@@ -23,7 +23,7 @@ app.AudioView =  Backbone.View.extend({
     this.songIndex = Math.floor(Math.random() * 7);
 
     // load and render the template
-    $.when($.get('/static/scripts/templates/audioControls.Handlebars'))
+    $.when($.get('/static/scripts/templates/audioControls.handlebars'))
      .done(function(tmpl){
       self.tmpl = tmpl;
       self.render();

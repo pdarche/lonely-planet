@@ -16,7 +16,7 @@ app.TweetsView = Backbone.View.extend({
       this.authenticated = false;
     }
     // fetch and cache the tweet template
-    $.when($.get('/static/scripts/templates/tweet.Handlebars'))
+    $.when($.get('/static/scripts/templates/tweet.handlebars'))
      .done(function(tmpl){
       self.tmpl = tmpl;
      });
