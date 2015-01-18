@@ -76,13 +76,17 @@ $(document).ready(function(){
     planetView.followerCount = count;
   });
 
-
   // on message, create a new tweetModel
   // and add it tweet to the collection
   socket.onmessage = function(ev){
     var tweet = JSON.parse(ev.data)
-      , tweetModel = new app.TweetModel(tweet);
+      , tweetModel = new app.TweetModel(tweet)
+      , tweetText = tweetModel.get('text')
+      , user = tweetModel.get('user')
 
+    tweetModel.set('text', emojione.toImage(tweetText))
+    user.screen_name = emojione.toImage(user.screen_name)
+    tweetModel.set('user', user)
     tweetsCollection.add(tweetModel);
   }
 

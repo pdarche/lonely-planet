@@ -111,6 +111,10 @@ body {
 	-webkit-transition: all .5s;
 }
 
+.tweet-text img.emojione {
+	height: 16px;
+}
+
 .tweet:hover{
 	background-color:rgba(255,255,255,.7);
 }
