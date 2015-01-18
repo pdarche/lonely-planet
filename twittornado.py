@@ -40,9 +40,9 @@ class TwitterStreamGET(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
         self.stream = None
         if self.proxy:
-            self.connect( self.proxy )
+            self.connect(self.proxy)
         else:
-            self.connect( (self.host, 443) )
+            self.connect((self.host, 443))
 
     @property
     def request(self):
