@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 from config import settings
 
+import re
+import os
+import json
+import sys
+
 import tornado.web
 import tornado.httpserver
 import tornado.httputil
@@ -8,12 +13,8 @@ import tornado.auth
 import tornado.httpclient
 import tornado.gen
 from tornado import websocket
-
 import twitstream
 import requests
-import re
-import os
-import json
 import dstk
 from pymongo import MongoClient
 
@@ -96,8 +97,8 @@ def tweet_callback(status):
 
     try:
         status = json.loads(status)
+        status['text'] = status['text'].encode('utf-8')
         url = create_geo_url(status)
-        text = status['text']
 
         if text.startswith('RT') or not url or 'http' in text:
             return
