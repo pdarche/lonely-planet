@@ -10,6 +10,7 @@ from tornado import iostream, ioloop
 from config import settings
 import json
 import ssl
+import logging
 
 # Yes, this is very strongly based upon the twitasync approach.
 # There was little call to change my approach on a first pass,
@@ -20,7 +21,24 @@ RESOURCE_URL = 'https://stream.twitter.com/1/statuses/filter.json'
 
 def build_oauth_header(params):
     return "OAuth " + ", ".join(
-            ['%s="%s"' % (k, v) for k, v in params.iteritems()]) #urllib.quote(v))
+            ['%s="%s"' % (k, v) for k, v in params.iteritems()])
+
+
+def to_header(parameters, realm=''):
+    """
+    Serialize as a header for an HTTPAuth request.
+    """
+    # auth_header = 'OAuth realm="%s"' % realm
+    auth_header = 'OAuth '
+    param_list = parameters.keys()
+    param_list.sort()
+    # Add the oauth parameters.
+    if parameters:
+        for k in param_list:
+            if k[:6] == 'oauth_':
+                auth_header += '%s="%s", ' % (k, parameters[k])
+    return {'Authorization': auth_header[:-2]}
+
 
 class TwitterStreamGET(object):
     def __init__(self, user, pword, url, action, debug=False, preprocessor=json.loads):
@@ -40,9 +58,9 @@ class TwitterStreamGET(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
         self.stream = None
         if self.proxy:
-            self.connect( self.proxy )
+            self.connect(self.proxy)
         else:
-            self.connect( (self.host, 443) )
+            self.connect((self.host, 443))
 
     @property
     def request(self):
@@ -66,7 +84,11 @@ class TwitterStreamGET(object):
 
         if self.debug:
             print >> sys.stderr, data
-        self.stream.read_until(self.terminator, self.found_terminator)
+        try:
+            self.stream.read_until(self.terminator, self.found_terminator)
+        except:
+            logging.error('THE DAMN ERROR OCCURED!')
+            return
 
     def run(self):
         self.stream.write(self.request)
@@ -136,20 +158,4 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
         oauth_req.sign_request(signature_method, consumer, token, include_body_hash=False)
         headers = oauth_req.to_header()
         return headers
-
-
-def to_header(parameters, realm=''):
-    """
-    Serialize as a header for an HTTPAuth request.
-    """
-    # auth_header = 'OAuth realm="%s"' % realm
-    auth_header = 'OAuth '
-    param_list = parameters.keys()
-    param_list.sort()
-    # Add the oauth parameters.
-    if parameters:
-        for k in param_list:
-            if k[:6] == 'oauth_':
-                auth_header += '%s="%s", ' % (k, parameters[k])
-    return {'Authorization': auth_header[:-2]}
 
