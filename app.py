@@ -141,7 +141,6 @@ class ClientSocket(websocket.WebSocketHandler):
             GLOBALS['users'].append(twitUser)
 
     def on_close(self):
-        print "WebSocket closed"
         GLOBALS['sockets'].remove(self)
 
 
