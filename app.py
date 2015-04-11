@@ -114,8 +114,7 @@ def tweet_callback(status):
             handle_request(response, status)
             insert_tweet(status)
 
-    except Exception, e:
-        print >> sys.stderr, e.message
+    except:
         pass
 
 
