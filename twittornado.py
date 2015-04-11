@@ -10,7 +10,6 @@ from tornado import iostream, ioloop
 from config import settings
 import json
 import ssl
-import logging
 
 # Yes, this is very strongly based upon the twitasync approach.
 # There was little call to change my approach on a first pass,
@@ -87,7 +86,7 @@ class TwitterStreamGET(object):
         try:
             self.stream.read_until(self.terminator, self.found_terminator)
         except:
-            logging.error('THE DAMN ERROR OCCURED!')
+            print >> sys.stderr, "THE DAMN ERROR OCCURED!"
             return
 
     def run(self):
