@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-from config import settings
+import re
+import os
+import json
 
 import re
 import os
@@ -16,9 +18,11 @@ from tornado import websocket
 import twitstream
 import requests
 import dstk
-from pymongo import MongoClient
+import pymongo
 
-client = MongoClient('localhost', 27017)
+from config import settings
+
+client = pymongo.MongoClient('localhost', 27017)
 db = client.lonely_planet
 
 GLOBALS={
@@ -31,7 +35,7 @@ twitUser = None
 authenticated = False
 ds = dstk.DSTK()
 
-if len(args) < 1:
+if not args:
     args = ['track', 'lonely']
     method = 'track'
 else:
@@ -51,11 +55,13 @@ def handle_request(response, status):
             for socket in GLOBALS['sockets']:
                 socket.write_message(status)
 
+
 def insert_tweet(status):
     """ Inserts tweet into Mongo"""
 
     status['replies'] = []
     return db.tweets.insert(status)
+
 
 def add_tweet_reply(tweet_id, user, text):
     """Adds a reply to the saved tweet"""
@@ -63,6 +69,7 @@ def add_tweet_reply(tweet_id, user, text):
     reply = {'user': user, 'text': text}
     return db.tweets.update(
         {'id_str': tweet_id}, {'$push': {'replies': reply}}, True)
+
 
 def create_geo_url(status):
     dstk_base = 'http://www.datasciencetoolkit.org/maps/api/geocode/json'
@@ -135,12 +142,10 @@ class ClientSocket(websocket.WebSocketHandler):
     def open(self):
         GLOBALS['sockets'].append(self)
         global twitUser
-        if twitUser != None:
+        if twitUser:
             GLOBALS['users'].append(twitUser)
-        print "WebSocket opened"
 
     def on_close(self):
-        print "WebSocket closed"
         GLOBALS['sockets'].remove(self)
 
 
@@ -190,10 +195,7 @@ class PostHandler(tornado.web.RequestHandler,
         tweet = json.loads(self.request.body)
 
         if oAuthToken and oAuthSecret:
-            accessToken = {
-                'key': oAuthToken,
-                'secret': oAuthSecret
-            }
+            accessToken = {'key': oAuthToken, 'secret': oAuthSecret}
             data = {
                 'status': tweet['responseText'],
                 'in_reply_to_status_id': tweet['id']
@@ -214,7 +216,6 @@ class PostHandler(tornado.web.RequestHandler,
             # Call failed; perhaps missing permission?
             self.authorize_redirect()
             return
-
 
 stream = twitstream.twitstream(
             method, options.username, options.password,
