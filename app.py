@@ -3,6 +3,7 @@ import re
 import os
 import json
 import sys
+import logging
 
 import tornado.web
 import tornado.httpserver
@@ -101,6 +102,7 @@ def tweet_callback(status):
     try:
         status = json.loads(status)
         status['text'] = status['text'].encode('utf-8')
+        text = status['text']
         url = create_geo_url(status)
 
         if text.startswith('RT') or not url or 'http' in text:
@@ -112,7 +114,8 @@ def tweet_callback(status):
             handle_request(response, status)
             insert_tweet(status)
 
-    except:
+    except Exception, e:
+        print >> sys.stderr, e.message
         pass
 
 
