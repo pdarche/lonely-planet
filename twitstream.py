@@ -31,17 +31,17 @@ BASEURL = defaultdict(constant_factory("https://stream.twitter.com/%s.json"))
 BASEURL['user'] = "https://chirpstream.twitter.com/%s.json"
 
 METHODPATH = {
-        'firehose':   '1/statuses/firehose',
+        'firehose': '1/statuses/firehose',
         'gardenhose': '1/statuses/sample',
-        'spritzer':   '1/statuses/sample',
-        'birddog':    '1/statuses/filter',
-        'shadow':     '1/statuses/filter',
-        'follow':     '1/statuses/filter',
-        'track':      '1/statuses/filter',
-        'filter':     '1/statuses/filter',
-        'retweet':    '1/statuses/retweet',
-        'links':      '1/statuses/links',
-        'user':       '2b/user',
+        'spritzer': '1/statuses/sample',
+        'birddog': '1/statuses/filter',
+        'shadow': '1/statuses/filter',
+        'follow': '1/statuses/filter',
+        'track': '1/statuses/filter',
+        'filter': '1/statuses/filter',
+        'retweet': '1/statuses/retweet',
+        'links': '1/statuses/links',
+        'user': '2b/user'
     }
 
 def DEFAULTACTION(status):
@@ -54,16 +54,17 @@ def DEFAULTACTION(status):
             pass
     # print "%s:\t%s\n" % (status.get('user', {}).get('screen_name'), status.get('text'))
 
-def twitstream(method, user, pword, action, defaultdata=[], debug=False, engine='async', **kwargs):
+def twitstream(method, user, pword, action, defaultdata=[],
+                        debug=False, engine='async', **kwargs):
     '''General function to set up an asynchat object on twitter. Chooses GET or
     POST according to the API method.
-    
+
     Parameter action is a callable that takes a dict derived from simplejson.
-    
-    Parameter defaultdata expects an iterable of strings as the default parameter 
+
+    Parameter defaultdata expects an iterable of strings as the default parameter
     (follow or track) on a POST method. If there are additional parameters you
     wish to use, they can be passed in **kwargs.'''
-    
+
     url = BASEURL[method] % METHODPATH[method]
 
     data = {POSTPARAMS[method]: ','.join(defaultdata)}
@@ -81,18 +82,11 @@ group = OptionGroup(parser, 'credentials',
 group.add_option('-p', '--password', help="Twitter password")
 group.add_option('-u', '--username', help="Twitter username")
 parser.add_option_group(group)
-parser.add_option('--debug', action='store_true', dest='debug', 
+parser.add_option('--debug', action='store_true', dest='debug',
                     default=False, help="Print debug information")
 egroup = OptionGroup(parser, 'engine',
                     "Selects the underlying library for asyncronous I/O.")
-egroup.add_option('--tornado', action='store_const', const='tornado', 
+egroup.add_option('--tornado', action='store_const', const='tornado',
                   dest='engine', help="Use Tornado's iostream library")
 parser.add_option_group(egroup)
 
-
-def ensure_credentials(options):
-    if not options.username:
-        options.username = raw_input("Twitter username: ")
-    if not options.password:
-        options.password = getpass.getpass(prompt='Password for %s: ' % options.username)
-    return options

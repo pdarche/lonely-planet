@@ -5,11 +5,12 @@ import json
 import sys
 import logging
 
+import tornado.auth
 import tornado.web
 import tornado.httpserver
 import tornado.httputil
-import tornado.auth
 import tornado.httpclient
+from tornado import iostream, ioloop
 import tornado.gen
 from tornado import websocket
 import twitstream
@@ -22,10 +23,8 @@ from config import settings
 client = pymongo.MongoClient('localhost', 27017)
 db = client.lonely_planet
 
-GLOBALS={
-    'sockets': [],
-    'users' : []
-}
+clients = []
+users = []
 
 (options, args) = twitstream.parser.parse_args()
 twitUser = None
@@ -41,21 +40,9 @@ else:
             method not in twitstream.POSTPARAMS:
         raise NotImplementedError("Unknown method: %s" % method)
 
-def handle_request(response, status):
-    """ Pushes the tweet to connected clients """
-    if response.error:
-        print "Error:", response.error
-    else:
-        res = json.loads(response.body)
-        if res['status'] == "OK":
-            status['lp_geo'] = res['results'][0]
-            for socket in GLOBALS['sockets']:
-                socket.write_message(status)
-
 
 def insert_tweet(status):
     """ Inserts tweet into Mongo"""
-
     status['replies'] = []
     return db.tweets.insert(status)
 
@@ -95,10 +82,22 @@ def create_geo_url(status):
 
     return url
 
+
+def handle_request(response, status):
+    """ Pushes the tweet to connected clients """
+    if response.error:
+        print "Error:", response.error
+    else:
+        res = json.loads(response.body)
+        if res['status'] == "OK":
+            status['lp_geo'] = res['results'][0]
+            for client in clients:
+                client.write_message(status)
+
+
 @tornado.gen.coroutine
 def tweet_callback(status):
     """Callback fired on data from the Twitter streaming API"""
-
     try:
         status = json.loads(status)
         status['text'] = status['text'].encode('utf-8')
@@ -108,7 +107,7 @@ def tweet_callback(status):
         if text.startswith('RT') or not url or 'http' in text:
             return
 
-        if GLOBALS['sockets']:
+        if clients:
             http_client = tornado.httpclient.AsyncHTTPClient()
             response = yield http_client.fetch(url)
             handle_request(response, status)
@@ -116,6 +115,12 @@ def tweet_callback(status):
 
     except:
         pass
+
+
+stream = twitstream.twitstream(
+            method, options.username, options.password,
+            tweet_callback, defaultdata=args[1:],
+            debug=options.debug, engine=options.engine)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -138,20 +143,20 @@ class MainHandler(tornado.web.RequestHandler):
 
 class ClientSocket(websocket.WebSocketHandler):
     def open(self):
-        GLOBALS['sockets'].append(self)
-        global twitUser
+        clients.append(self)
+
         if twitUser:
-            GLOBALS['users'].append(twitUser)
+            users.append(twitUser)
 
     def on_close(self):
-        GLOBALS['sockets'].remove(self)
+        clients.remove(self)
 
 
 class Announcer(tornado.web.RequestHandler):
     def get(self, *args, **kwargs):
         data = self.get_argument('data')
-        for socket in GLOBALS['sockets']:
-            socket.write_message(data)
+        for client in clients:
+            client.write_message(data)
         self.write('Posted')
 
 
@@ -211,15 +216,9 @@ class PostHandler(tornado.web.RequestHandler,
 
     def _on_post(self, new_entry):
         if not new_entry:
-            # Call failed; perhaps missing permission?
             self.authorize_redirect()
             return
 
-stream = twitstream.twitstream(
-            method, options.username, options.password,
-            tweet_callback, defaultdata=args[1:],
-            debug=options.debug, engine=options.engine
-        )
 
 settings = dict(
     twitter_consumer_key=settings['CONSUMER_KEY'],
@@ -230,8 +229,8 @@ settings = dict(
 )
 
 if __name__ == "__main__":
-	app = tornado.web.Application(
-		handlers = [
+    app = tornado.web.Application(
+    	handlers = [
             (r"/", IndexHandler),
             (r"/planet", MainHandler),
             (r"/login", TwitterHandler),
@@ -242,7 +241,7 @@ if __name__ == "__main__":
             (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static"}),
         ],
         **settings
-	)
-	http_server = tornado.httpserver.HTTPServer(app)
-	http_server.listen(9000)
-	stream.run()
+    )
+    http_server = tornado.httpserver.HTTPServer(app)
+    http_server.listen(9000)
+    stream.run()

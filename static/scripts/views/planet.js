@@ -18,7 +18,7 @@ app.PlanetView = Backbone.View.extend({
     this.NEAR = 0.1;
     this.FAR = 10000;
     this.position = {x: 0, y: 0, z: 1200};
-    this.target = {x: 0, y: 200, z: 200};
+    this.target = {x: 0, y: 150, z: 220};
     this.tween = new TWEEN.Tween(this.position)
                             .to(this.target, 8000);
 
@@ -469,25 +469,6 @@ app.PlanetView = Backbone.View.extend({
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   },
-
-  //NOTE: this is not being used
-  // mouseMove: function(ev) {
-  //   ev.preventDefault();
-  //   mouse2D.x = (ev.clientX / window.innerWidth) * 2 - 1;
-  //   mouse2D.y = -(ev.clientY / window.innerHeight) * 2 + 1;
-
-  //   mouse3D = this.projector.unprojectVector(mouse2D.clone(), this.camera);
-  //   ray.direction = mouse3D.subSelf(this.camera.position).normalize();
-
-  //   var intersects = ray.intersectObjects(this.scene.children);
-
-  //   // mouseover stuff to see if the mose is intersecting a tweet
-  //   if (intersects.length > 0) {
-  //     // if ( ROLLOVERED ) ROLLOVERED.color.setHex( 0x00ff80 );
-  //     ROLLOVERED = intersects;
-  //     // console.log( intersects )
-  //   }
-  // },
 
   dropPin: function(latitude, longitude, color, tweet) {
     var group1, group2, marker, markerLength, indicator;
