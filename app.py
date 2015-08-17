@@ -113,8 +113,6 @@ def create_google_components(status):
             'administrative_area': split[1].strip()
         }
 
-    print "component is %r" % components
-
     return components
 
 
