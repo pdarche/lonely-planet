@@ -80,7 +80,6 @@ class TwitterStreamGET(object):
             print >> sys.stderr, data
         if data.startswith('{'):
             self.action(data)
-
         if self.debug:
             print >> sys.stderr, data
         try:
