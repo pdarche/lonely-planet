@@ -170,7 +170,6 @@ def google_geocode(status):
 
         if hasattr(response, 'raw'):
             status['lp_geo'] = response.raw
-
             return status
 
 
@@ -204,7 +203,7 @@ def tweet_callback(status):
 
             if geocoded_status:
                 broadcast(geocoded_status)
-                # insert_tweet(status)
+                insert_tweet(geocoded_status)
 
 
 stream = twitstream.twitstream(
