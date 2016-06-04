@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import re
 import os
 import json
 
@@ -11,7 +10,6 @@ import tornado.httpclient
 import tornado.gen
 from tornado import websocket
 import twitstream
-import dstk
 import pymongo
 from geopy.geocoders import GoogleV3
 
@@ -26,7 +24,6 @@ users = []
 (options, args) = twitstream.parser.parse_args()
 twit_user = None
 authenticated = False
-ds = dstk.DSTK({'apiBase': "http://ec2-54-147-255-11.compute-1.amazonaws.com"})
 geo = GoogleV3()
 
 if not args:
@@ -40,7 +37,7 @@ else:
 
 
 def insert_tweet(status):
-    """ Inserts tweet into Mongo """
+    """ Inserts tweet into tweets collection """
     status['replies'] = []
     return db.tweets.insert(status)
 
@@ -52,43 +49,9 @@ def add_tweet_reply(tweet_id, user, text):
         {'id_str': tweet_id}, {'$push': {'replies': reply}}, True)
 
 
-def create_dstk_geo_url(status):
-    """ Creates a url for the DSTK google-style geocoder
-
-    Args:
-        status: Dict of the tweet
-
-    Returns:
-        url: String to send to the DSTK geocoder
-    """
-    dstk_base = 'http://ec2-54-147-255-11.compute-1.amazonaws.com/maps/api/geocode/json'
-    dstk_tail = 'sensor=false'
-    coordinates = filter(bool, [status['geo'], status['coordinates']])
-    url = None
-
-    if coordinates:
-        lat = coords['coordinates'][0]
-        lon = coords['coordinates'][1]
-        url = "%s?latlng=%s,+%s&%s" % (dstk_base, lat, lon, dstk_tail)
-
-    elif status['place']:
-        split = status['place']['full_name'].split(',')
-        city = split[0].strip()
-        state = split[1].strip()
-        country = status['place']['country']
-        url = "%s?%s,%s,%s&%s" % (dstk_base, city, state, country, dstk_tail)
-
-    elif status['user']['location']:
-        location = status['user']['location']
-        url = "%s?address=%s&%s" % (dstk_base, location, dstk_tail)
-        url = re.sub('\s+', '+', url)
-        url = re.sub(',', '+', url)
-
-    return url
-
-
 def create_google_components(status):
-    """ Creates a components dict for the google geocoder
+    """
+    Creates a components dict for the google geocoder
 
     Args:
         status: Dict of the tweet
@@ -116,46 +79,9 @@ def create_google_components(status):
     return components
 
 
-def handle_dstk_geocoding(response, status):
-    """ Checks if the DSTK has returned a response
-
-    Args:
-        response: Dict of dstk geocoder response
-        status: Dict of the tweet
-
-    Returns:
-        status: Dict of the geocoding tweet
+def geocode_status(status):
     """
-    if response.error:
-        print "Error:", response.error
-    else:
-        res = json.loads(response.body)
-        if res['status'] == "OK":
-            status['lp_geo'] = res['results'][0]
-            return status
-
-
-def dstk_geocode(status):
-    """ Uses the DSTK to geocode the tweet
-
-    Args:
-        status: Dict of the tweet
-
-    Returns:
-        geocoded_status: Dict of geocoded status (or None)
-    """
-    url = create_dstk_geo_url(status)
-
-    if url:
-        http_client = tornado.httpclient.AsyncHTTPClient()
-        response = yield http_client.fetch(url)
-        geocoded_status = handle_dstk_geocoding(response, status)
-
-        # return geocoded_status
-
-
-def google_geocode(status):
-    """ Uses the Google V3 geocoder to geocode the tweet
+    Uses the Google V3 geocoder to geocode the tweet
 
     Args:
         status: Dict of the tweet
@@ -181,7 +107,8 @@ def broadcast(data):
 
 @tornado.gen.coroutine
 def tweet_callback(status):
-    """ Callback fired on data from the Twitter streaming API.
+    """
+    Callback fired on data from the Twitter streaming API.
     Filters out tweets with RTs or urls in them, geocodes them
     if they have location information, and pushes the geocoded
     tweets out to connected clients
@@ -199,17 +126,11 @@ def tweet_callback(status):
         # contain a url or start with an RT
         if clients and not text.startswith('RT') and not 'http' in text:
             # Geocoding
-            geocoded_status = google_geocode(status)
+            geocoded_status = geocode_status(status)
 
             if geocoded_status:
                 broadcast(geocoded_status)
                 insert_tweet(geocoded_status)
-
-
-stream = twitstream.twitstream(
-    method, options.username, options.password,
-    tweet_callback, defaultdata=args[1:],
-    debug=options.debug, engine=options.engine)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -309,15 +230,20 @@ class PostHandler(tornado.web.RequestHandler,
             return
 
 
-settings = dict(
-    twitter_consumer_key=settings['CONSUMER_KEY'],
-    twitter_consumer_secret=settings['CONSUMER_SECRET'],
-    cookie_secret=settings['COOKIE_SECRET'],
-    template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
-    static_path=os.path.join(os.path.dirname(__file__), "static")
-)
-
 if __name__ == "__main__":
+    settings = dict(
+        twitter_consumer_key=settings['CONSUMER_KEY'],
+        twitter_consumer_secret=settings['CONSUMER_SECRET'],
+        cookie_secret=settings['COOKIE_SECRET'],
+        template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
+        static_path=os.path.join(os.path.dirname(__file__), "static")
+    )
+
+    stream = twitstream.twitstream(
+        method, options.username, options.password,
+        tweet_callback, defaultdata=args[1:],
+        debug=options.debug, engine=options.engine)
+
     app = tornado.web.Application(
     	handlers = [
             (r"/", IndexHandler),
