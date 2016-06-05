@@ -11,37 +11,12 @@ from config import settings
 import json
 import ssl
 
-# Yes, this is very strongly based upon the twitasync approach.
-# There was little call to change my approach on a first pass,
-# and the IOStream interface is very similar to asyncore/asynchat.
 
-USERAGENT = "twitstream.py (http://www.github.com/atl/twitstream), using tornado.iostream"
-RESOURCE_URL = 'https://stream.twitter.com/1/statuses/filter.json'
-
-def build_oauth_header(params):
-    return "OAuth " + ", ".join(
-            ['%s="%s"' % (k, v) for k, v in params.iteritems()])
-
-
-def to_header(parameters, realm=''):
-    """
-    Serialize as a header for an HTTPAuth request.
-    """
-    # auth_header = 'OAuth realm="%s"' % realm
-    auth_header = 'OAuth '
-    param_list = parameters.keys()
-    param_list.sort()
-    # Add the oauth parameters.
-    if parameters:
-        for k in param_list:
-            if k[:6] == 'oauth_':
-                auth_header += '%s="%s", ' % (k, parameters[k])
-    return {'Authorization': auth_header[:-2]}
-
+USERAGENT = "twitstream.py, using tornado.iostream"
+RESOURCE_URL = 'https://stream.twitter.com/1.1/statuses/filter.json'
 
 class TwitterStreamGET(object):
-    def __init__(self, user, pword, url, action, debug=False, preprocessor=json.loads):
-        self.authkey = base64.b64encode("%s:%s" % (user, pword))
+    def __init__(self, url, action, debug=False, preprocessor=json.loads):
         self.preprocessor = preprocessor
         self.url = url
         self.host = urlparse(url)[1]
@@ -64,7 +39,6 @@ class TwitterStreamGET(object):
     @property
     def request(self):
         request  = 'GET %s HTTP/1.1\r\n' % self.url
-        request += 'Authorization: Basic %s\r\n' % self.authkey
         request += 'Accept: application/json\r\n'
         request += 'User-Agent: %s\r\n' % USERAGENT
         request += '\r\n'
@@ -82,11 +56,7 @@ class TwitterStreamGET(object):
             self.action(data)
         if self.debug:
             print >> sys.stderr, data
-        try:
-            self.stream.read_until(self.terminator, self.found_terminator)
-        except:
-            print >> sys.stderr, "THE DAMN ERROR OCCURED!"
-            return
+        self.stream.read_until(self.terminator, self.found_terminator)
 
     def run(self):
         self.stream.write(self.request)
@@ -97,28 +67,9 @@ class TwitterStreamGET(object):
         self.stream.close()
 
 
-class TwitterStreamPOST(TwitterStreamGET):
-    def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
-        TwitterStreamGET.__init__(self, user, pword, url, action, debug, preprocessor)
-        self.data = data
-
-    @property
-    def request(self):
-        data = urllib.urlencode(self.data)
-        request  = 'POST %s HTTP/1.0\r\n' % self.url
-        request += 'Authorization: Basic %s\r\n' % self.authkey
-        request += 'Accept: application/json\r\n'
-        request += 'User-Agent: %s\r\n' % USERAGENT
-        request += 'Content-Type: application/x-www-form-urlencoded\r\n'
-        request += 'Content-Length: %d\r\n' % len(data)
-        request += '\r\n'
-        request += '%s' % data
-        return request
-
-
 class TwitterStreamOAuth2POST(TwitterStreamGET):
-    def __init__(self, user, pword, url, action, data=tuple(), debug=False, preprocessor=json.loads):
-        TwitterStreamGET.__init__(self, user, pword, url, action, debug, preprocessor)
+    def __init__(self, url, action, data=tuple(), debug=False, preprocessor=json.loads):
+        TwitterStreamGET.__init__(self, url, action, debug, preprocessor)
         self.data = data
 
     @property
@@ -140,7 +91,7 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
         consumer = oauth2.Consumer(
             key=settings['CONSUMER_KEY'],secret=settings['CONSUMER_SECRET'])
         token = oauth2.Token(
-            settings['ACCESS_KEY'], settings['ACCESS_SECRET'])
+            settings['OAUTH_TOKEN'], settings['OAUTH_SECRET'])
 
         params = {
             'oauth_version': "1.0",

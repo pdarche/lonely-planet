@@ -8,8 +8,10 @@ import tornado.httpserver
 import tornado.httputil
 import tornado.httpclient
 import tornado.gen
+from tornado import iostream, ioloop
 from tornado import websocket
 import twitstream
+import tweepy
 import pymongo
 from geopy.geocoders import GoogleV3
 
@@ -20,20 +22,9 @@ db = client.lonely_planet
 
 clients = []
 users = []
-
-(options, args) = twitstream.parser.parse_args()
-twit_user = None
-authenticated = False
 geo = GoogleV3()
-
-if not args:
-    args = ['track', 'lonely']
-    method = 'track'
-else:
-    method = args[0]
-    if method not in twitstream.GETMETHODS and \
-            method not in twitstream.POSTPARAMS:
-        raise NotImplementedError("Unknown method: %s" % method)
+args = ['track', 'pizza']
+method = 'track'
 
 
 def insert_tweet(status):
@@ -50,17 +41,8 @@ def add_tweet_reply(tweet_id, user, text):
 
 
 def create_google_components(status):
-    """
-    Creates a components dict for the google geocoder
-
-    Args:
-        status: Dict of the tweet
-
-    Returns:
-        components: Dict of location components
-    """
+    """ Creates a components dict for the google geocoder """
     components = None
-
     if status['place']:
         split = status['place']['full_name'].split(',')
         components = {
@@ -69,34 +51,37 @@ def create_google_components(status):
             'country': status['place']['country']
         }
 
-    elif status['user'].has_key('location'):
+    elif status['user'].has_key('location') and status['user']['location']:
         split = status['user']['location'].split(',')
         components = {
             'locality': split[0].strip(),
-            'administrative_area': split[1].strip()
+            'administrative_area': split[1].strip() if len(split) > 1 else ''
         }
-
     return components
 
 
+def tweet_is_valid(status):
+    """
+    Runs various tests on the tweet text
+    to make sure its' a good one.
+    """
+    text = status['text']
+    if not text.startswith('RT') and not 'http' in text:
+        return True
+    else:
+        return False
+
+
 def geocode_status(status):
-    """
-    Uses the Google V3 geocoder to geocode the tweet
-
-    Args:
-        status: Dict of the tweet
-
-    Returns:
-        geocoded_status: Dict of geocoded status (or None)
-    """
+    """ Uses the Google V3 geocoder to geocode the tweet """
     components = create_google_components(status)
-
     if components:
         response = geo.geocode("", components=components)
-
-        if hasattr(response, 'raw'):
-            status['lp_geo'] = response.raw
-            return status
+        coded = response.raw if hasattr(response, 'raw') else None
+    else:
+        coded = None
+    status['lp_geo'] = coded
+    return status
 
 
 def broadcast(data):
@@ -112,25 +97,13 @@ def tweet_callback(status):
     Filters out tweets with RTs or urls in them, geocodes them
     if they have location information, and pushes the geocoded
     tweets out to connected clients
-
-    Args:
-        status: Dict of tweet information
-
     """
-    # If the tweet pulled from the stream is complete:
     if status[-3].endswith('}'):
         status = json.loads(status)
-        text = status['text']
-
-        # If clients are connected and the tweet doesn't
-        # contain a url or start with an RT
-        if clients and not text.startswith('RT') and not 'http' in text:
-            # Geocoding
-            geocoded_status = geocode_status(status)
-
-            if geocoded_status:
-                broadcast(geocoded_status)
-                insert_tweet(geocoded_status)
+        if tweet_is_valid(status):
+            status = geocode_status(status)
+            broadcast(status)
+            # insert_tweet(geocoded_status)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -154,9 +127,8 @@ class MainHandler(tornado.web.RequestHandler):
 class ClientSocket(websocket.WebSocketHandler):
     def open(self):
         clients.append(self)
-
-        if twit_user:
-            users.append(twit_user)
+        # if twit_user:
+        #     users.append(twit_user)
 
     def on_close(self):
         clients.remove(self)
@@ -185,7 +157,6 @@ class TwitterHandler(tornado.web.RequestHandler,
         self.set_secure_cookie('user_id', str(user['id']))
         self.set_secure_cookie('oauth_token', user['access_token']['key'])
         self.set_secure_cookie('oauth_secret', user['access_token']['secret'])
-
         self.redirect('/planet')
 
 
@@ -194,7 +165,6 @@ class LogoutHandler(tornado.web.RequestHandler):
         self.clear_cookie('user_id')
         self.clear_cookie('oauth_token')
         self.clear_cookie('oauth_secret')
-
         self.redirect('/')
 
 
@@ -231,6 +201,11 @@ class PostHandler(tornado.web.RequestHandler,
 
 
 if __name__ == "__main__":
+    # Stream
+    stream = twitstream.twitstream(
+        method, tweet_callback, defaultdata=args[1:])
+
+    # Tornado
     settings = dict(
         twitter_consumer_key=settings['CONSUMER_KEY'],
         twitter_consumer_secret=settings['CONSUMER_SECRET'],
@@ -238,12 +213,6 @@ if __name__ == "__main__":
         template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
         static_path=os.path.join(os.path.dirname(__file__), "static")
     )
-
-    stream = twitstream.twitstream(
-        method, options.username, options.password,
-        tweet_callback, defaultdata=args[1:],
-        debug=options.debug, engine=options.engine)
-
     app = tornado.web.Application(
     	handlers = [
             (r"/", IndexHandler),
