@@ -124,13 +124,6 @@ body {
 	width: 240px;
 }
 
-.location {
-	display: inline-block;;
-	font-size: 10px;
-	text-align: right;
-	float: right;
-}
-
 .user-name{
 	font-weight:bold;
 	height: 20px;
@@ -143,6 +136,13 @@ body {
 	max-width: 120px;
 	height: 20px;
 	overflow: hidden;
+}
+
+.location {
+	display: inline-block;;
+	font-size: 10px;
+	text-align: right;
+	float: right;
 }
 
 .followers{

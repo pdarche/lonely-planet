@@ -20,11 +20,9 @@ from config import settings
 client = pymongo.MongoClient('localhost', 27017)
 db = client.lonely_planet
 
-clients = []
-users = []
+CLIENTS = []
+USERS = []
 geo = GoogleV3()
-args = ['track', 'pizza']
-method = 'track'
 
 
 def insert_tweet(status):
@@ -86,7 +84,7 @@ def geocode_status(status):
 
 def broadcast(data):
     """ Pushes data to all connected clients """
-    for client in clients:
+    for client in CLIENTS:
         client.write_message(data)
 
 
@@ -126,20 +124,12 @@ class MainHandler(tornado.web.RequestHandler):
 
 class ClientSocket(websocket.WebSocketHandler):
     def open(self):
-        clients.append(self)
+        CLIENTS.append(self)
         # if twit_user:
-        #     users.append(twit_user)
+        #     USERS.append(twit_user)
 
     def on_close(self):
-        clients.remove(self)
-
-
-class Announcer(tornado.web.RequestHandler):
-    def get(self, *args, **kwargs):
-        data = self.get_argument('data')
-        for client in clients:
-            client.write_message(data)
-        self.write('Posted')
+        CLIENTS.remove(self)
 
 
 class TwitterHandler(tornado.web.RequestHandler,
@@ -203,7 +193,7 @@ class PostHandler(tornado.web.RequestHandler,
 if __name__ == "__main__":
     # Stream
     stream = twitstream.twitstream(
-        method, tweet_callback, defaultdata=args[1:])
+        'track', tweet_callback, defaultdata=['lonely'])
 
     # Tornado
     settings = dict(
@@ -221,7 +211,6 @@ if __name__ == "__main__":
             (r"/logout", LogoutHandler),
             (r"/post/([0-9]+)", PostHandler),
             (r"/socket", ClientSocket),
-            (r"/push", Announcer),
             (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "./static"}),
         ],
         **settings
