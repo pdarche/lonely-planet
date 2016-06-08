@@ -39,7 +39,7 @@ app.PlanetView = Backbone.View.extend({
       'setupFilmEffect', 'setupProjector', 'setupTween',
       'addLights', 'addStars', 'addControls', 'loop',
       'render', 'resize', 'onMouseMove', 'onMouseDown',
-      'onMouseUp', 'newTweet', 'uAreHere', 'onTweet'
+      'onMouseUp', 'uAreHere', 'onTweet'
     );
 
     // setup the scene
@@ -174,8 +174,6 @@ app.PlanetView = Backbone.View.extend({
     });
   },
 
-
-
   onTweet: function(){
     var tweet = this.collection.last()
     var geo = tweet.get('lp_geo');
@@ -187,7 +185,7 @@ app.PlanetView = Backbone.View.extend({
       var distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
 
       if (this.userLat){
-        tweet.set('dist_from_user', distFromUser);
+        tweet.set('dist_from_user', distFromUser + " miles from you");
       }
 
       this.group.add(pin);
@@ -556,7 +554,7 @@ app.PlanetView = Backbone.View.extend({
 
   distBtw: function(lat1, lon1, lat2, lon2, unit) {
     // if ( unit === undefined ) unit = 3958.761;
-    var r = 3958.761; //this.validateRadius(unit);
+    var r = 3958.761;
     lat1 *= Math.PI / 180;
     lon1 *= Math.PI / 180;
     lat2 *= Math.PI / 180;
@@ -565,8 +563,9 @@ app.PlanetView = Backbone.View.extend({
     var a = Math.pow(Math.cos(lat2) * Math.sin(lonDelta) , 2) + Math.pow(Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lonDelta) , 2);
     var b = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lonDelta);
     var angle = Math.atan2(Math.sqrt(a) , b);
+    var dist = angle * r;
 
-    return angle * r;
+    return dist >= 1 ? Math.floor(dist) : dist
   }
 
 });

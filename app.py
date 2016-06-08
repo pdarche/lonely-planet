@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import re
 import os
 import json
 
@@ -64,7 +65,8 @@ def tweet_is_valid(status):
     to make sure its' a good one.
     """
     text = status['text']
-    if not text.startswith('RT') and not 'http' in text:
+    pattern = re.compile(r'.*(^RT|http|@|[Ll]onely\s[Ii]sland)')
+    if not re.match(pattern, text):
         return True
     else:
         return False

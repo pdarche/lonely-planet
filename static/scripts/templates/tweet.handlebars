@@ -8,7 +8,10 @@
 				<a href="http://twitter.com/{{{tweet.user.screen_name}}}" Target="_blank"> {{tweet.user.name}}</a>
 				<div class="location"> {{tweet.lp_geo.formatted_address}} </div>
 			</div>
-			<div class="followers">followers: {{tweet.user.followers_count}} </div>
+			<div class="followers-dist">
+				<div class="followers">followers: {{tweet.user.followers_count}} </div>
+				<div class="user-dist">{{tweet.dist_from_user}}</div>
+			</div>
 			<div class="tweet-text"> {{{tweet.text}}} </div>
 		</div>
 		<div class="reply">
