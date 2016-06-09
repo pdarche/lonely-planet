@@ -29,7 +29,7 @@ app.AudioView =  Backbone.View.extend({
       self.render();
       self.audioPlayer = document.getElementById('audio_player')
       self.audioPlayer.src = self.basePath + self.songPaths[self.songIndex]
-      // self.audioPlayer.play();
+      self.audioPlayer.play();
       self.updateSongTitle();
 
        _.bindAll(self, 'onEnded', 'bindSlider');

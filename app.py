@@ -22,7 +22,6 @@ client = pymongo.MongoClient('localhost', 27017)
 db = client.lonely_planet
 
 CLIENTS = []
-USERS = []
 geo = GoogleV3()
 
 
@@ -64,8 +63,11 @@ def tweet_is_valid(status):
     Runs various tests on the tweet text
     to make sure its' a good one.
     """
+    if not status.has_key('text'):
+        return False
+
     text = status['text']
-    pattern = re.compile(r'.*(^RT|http|@|[Ll]onely\s[Ii]sland)')
+    pattern = re.compile(r'.*(^RT|http|https|@|[Ll]onely\s[Ii]sland)')
     if not re.match(pattern, text):
         return True
     else:
@@ -100,10 +102,10 @@ def tweet_callback(status):
     """
     if status[-3].endswith('}'):
         status = json.loads(status)
-        if tweet_is_valid(status):
+        # insert_tweet(status)
+        if tweet_is_valid(status) and CLIENTS:
             status = geocode_status(status)
             broadcast(status)
-            # insert_tweet(geocoded_status)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -127,8 +129,6 @@ class MainHandler(tornado.web.RequestHandler):
 class ClientSocket(websocket.WebSocketHandler):
     def open(self):
         CLIENTS.append(self)
-        # if twit_user:
-        #     USERS.append(twit_user)
 
     def on_close(self):
         CLIENTS.remove(self)
