@@ -12,7 +12,6 @@ import tornado.gen
 from tornado import iostream, ioloop
 from tornado import websocket
 import twitstream
-import tweepy
 import pymongo
 from geopy.geocoders import GoogleV3
 
