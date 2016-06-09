@@ -8,13 +8,15 @@
 	<div id="additional_info" class="hide">
 		<div id="remove">X</div>
 		<div id="info_text">
-			<p> Lonely Planet is an attempt to use real-time twitter data to see where lonely people are in the world.</p>
+			<p> Lonely Planet is an attempt at stimulating sympathy and (possibly) support for strangers using real-time Twitter data.</p>
 
-			<p>It started off as an assignment for Stewart Smith's Visualizing JS class at NYU ITP.  In late 2014 I cleaned up the code and redeployed it.</p>
+			<p>The application listens to Twitter's streaming api for metions of the term 'lonely'.  Tweets containing links, @-mentions, and RTs are discarded, and those with geographical information are geocoded.  Tweets are then pushed out to clients and represent on the planet.</p>
 
-			<p>A small python server listens to the Twitter streaming api for mentions of the term 'lonely'.  When a lonely tweet is found, it's processed and sent out to all of the connected clients.  If the tweet contains links, or starts with an RT, it's discarded.  If it contains location information that info is passed through the Data Science Toolkit geocoder and added to the tweet. Finally, the tweet is stored in a database.</p>
+			<p>Users who are logged in through Twitter can reply to tweets.  (I'd recommend trying this.  Supportive tweets are very often favorited.)</p>
 
-			<p> <strong>Data privacy note:</strong> User location data is not saved and is never communicated to the server.  If a user has connected twitter and replies to a tweet, the reply will be saved.</p>
+			<p>Lonely Planet was orginally developed for assignment in Stewart Smith's Visualizing JS class at NYU ITP.  In late 2014 I cleaned up the code and redeployed it.</p>
+
+			<p> <strong>Data privacy note:</strong> User location data is never saved nor communicated to the server.</p>
 		</div>
 	</div>
 </script>

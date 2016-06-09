@@ -39,7 +39,7 @@ app.PlanetView = Backbone.View.extend({
       'setupFilmEffect', 'setupProjector', 'setupTween',
       'addLights', 'addStars', 'addControls', 'loop',
       'render', 'resize', 'onMouseMove', 'onMouseDown',
-      'onMouseUp', 'newTweet', 'uAreHere'
+      'onMouseUp', 'uAreHere', 'onTweet'
     );
 
     // setup the scene
@@ -69,7 +69,7 @@ app.PlanetView = Backbone.View.extend({
     $(document).mouseup(this.onMouseUp);
 
     // bind new tweet event to the collection
-    this.collection.bind('add', this.newTweet);
+    this.collection.bind('add', this.onTweet);
   },
 
   render: function() {
@@ -101,7 +101,7 @@ app.PlanetView = Backbone.View.extend({
     ev.preventDefault();
 
     if (!this.mouseDown) {
-        return;
+      return;
     }
 
     this.mouseX = ev.clientX - this.windowHalfX;
@@ -174,27 +174,49 @@ app.PlanetView = Backbone.View.extend({
     });
   },
 
-  newTweet: function(ev){
+  onTweet: function(){
     var tweet = this.collection.last()
-      , lat = tweet.get('lp_geo').geometry.location.lat
-      , lng = tweet.get('lp_geo').geometry.location.lng
-      , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet)
-      , distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
+    var geo = tweet.get('lp_geo');
 
-    var geo = tweet.get('lp_geo')
-    if (geo.address_components[0].long_name.length <= 4){
-      console.log('small geo', geo)
-    }
+    if (geo) {
+      var lat = tweet.get('lp_geo').geometry.location.lat;
+      var lng = tweet.get('lp_geo').geometry.location.lng;
+      var pin = this.dropPin(lat, lng, 0xFFFFFF, tweet);
+      var distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
 
-    if (this.userLat){
-      tweet.set('dist_from_user', distFromUser);
-    }
+      if (this.userLat){
+        tweet.set('dist_from_user', distFromUser + " miles from you");
+      }
 
-    if (tweet.get('user').followers_count <= this.followerCount){
       this.group.add(pin);
       this.pins.unshift(pin);
     }
   },
+
+  // TODO: figure out what to do with this and remove it
+  // newTweet: function(ev){
+  //   var tweet = this.collection.last()
+  //     , lat = tweet.get('lp_geo').geometry.location.lat
+  //     , lng = tweet.get('lp_geo').geometry.location.lng
+  //     , pin = this.dropPin(lat, lng, 0xFFFFFF, tweet)
+  //     , distFromUser = this.distBtw(lat, lng, this.userLat, this.userLng);
+
+  //   var geo = tweet.get('lp_geo')
+  //   if (geo.address_components[0].long_name.length <= 4){
+  //     console.log('small geo', geo)
+  //   }
+
+  //   if (this.userLat){
+  //     tweet.set('dist_from_user', distFromUser);
+  //   }
+
+  //   // add the tweet if the foller count
+  //   // is below the target follower count
+  //   if (tweet.get('user').followers_count <= this.followerCount){
+  //     this.group.add(pin);
+  //     this.pins.unshift(pin);
+  //   }
+  // },
 
   setupTween: function(){
     var self = this;
@@ -532,7 +554,7 @@ app.PlanetView = Backbone.View.extend({
 
   distBtw: function(lat1, lon1, lat2, lon2, unit) {
     // if ( unit === undefined ) unit = 3958.761;
-    var r = 3958.761; //this.validateRadius(unit);
+    var r = 3958.761;
     lat1 *= Math.PI / 180;
     lon1 *= Math.PI / 180;
     lat2 *= Math.PI / 180;
@@ -541,8 +563,9 @@ app.PlanetView = Backbone.View.extend({
     var a = Math.pow(Math.cos(lat2) * Math.sin(lonDelta) , 2) + Math.pow(Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lonDelta) , 2);
     var b = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lonDelta);
     var angle = Math.atan2(Math.sqrt(a) , b);
+    var dist = angle * r;
 
-    return angle * r;
+    return dist >= 1 ? Math.floor(dist) : dist
   }
 
 });

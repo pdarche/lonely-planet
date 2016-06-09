@@ -124,31 +124,46 @@ body {
 	width: 240px;
 }
 
-.location {
-	display: inline-block;;
-	font-size: 10px;
-	text-align: right;
-	float: right;
-}
-
 .user-name{
 	font-weight:bold;
 	height: 20px;
 }
 
 .user-name a {
-	display: inline-block;
-	color:black;
-	float: left;
-	max-width: 120px;
-	height: 20px;
-	overflow: hidden;
+    color: black;
+    float: left;
+    max-width: 120px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.location {
+	font-size: 10px;
+    text-align: right;
+    height: 20px;
+    overflow: hidden;
+}
+
+.followers-dist {
+	height: 10px;
+	line-height:90%;
+	margin-bottom: 5px;
 }
 
 .followers{
 	font-size:10px;
-	line-height:90%;
+
 	margin-bottom:5px;
+    color: black;
+    float: left;
+    max-width: 120px;
+    overflow: hidden;
+}
+
+.user-dist {
+	font-size: 10px;
+    text-align: right;
+    overflow: hidden;
 }
 
 .reply {
