@@ -102,7 +102,7 @@ def tweet_callback(status):
     """
     if status[-3].endswith('}'):
         status = json.loads(status)
-        # insert_tweet(status)
+        insert_tweet(status)
         if tweet_is_valid(status) and CLIENTS:
             status = geocode_status(status)
             broadcast(status)
