@@ -66,7 +66,7 @@ def tweet_is_valid(status):
         return False
 
     text = status['text']
-    pattern = re.compile(r'.*(^RT|http|https|@|[Ll]onely\s[Ii]sland)')
+    pattern = re.compile(r'.*(^RT|https?|@|[Ll]onely\s[Ii]sland)')
     if not re.match(pattern, text):
         return True
     else:
@@ -102,11 +102,10 @@ def tweet_callback(status):
     if status[-3].endswith('}'):
         status = json.loads(status)
         if tweet_is_valid(status):
-            insert_tweet(status)
             if CLIENTS:
                 status = geocode_status(status)
                 broadcast(status)
-
+            # insert_tweet(status)
 
 
 class IndexHandler(tornado.web.RequestHandler):
