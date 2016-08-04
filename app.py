@@ -65,8 +65,8 @@ def tweet_is_valid(status):
     if not status.has_key('text'):
         return False
 
-    text = status['text']
-    pattern = re.compile(r'.*(^RT|.*https?|@|[Ll]onely\s[Ii]sland)')
+    text = status['text'].encode('utf-8')
+    pattern = re.compile('.*(^RT|https?.*|@|[Ll]onely\s[Ii]sland)')
     if not re.match(pattern, text):
         return True
     else:
