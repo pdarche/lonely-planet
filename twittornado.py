@@ -104,7 +104,7 @@ class TwitterStreamOAuth2POST(TwitterStreamGET):
 
         oauth_req = oauth2.Request(method="POST", url=RESOURCE_URL, parameters=params)
         signature_method = oauth2.SignatureMethod_HMAC_SHA1()
-        oauth_req.sign_request(signature_method, consumer, token, include_body_hash=False)
+        oauth_req.sign_request(signature_method, consumer, token)
         headers = oauth_req.to_header()
         return headers
 
