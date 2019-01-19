@@ -3,4 +3,5 @@ logging
 pymongo
 requests
 oauth
+oauth2==1.5.211
 geopy
