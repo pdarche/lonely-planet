@@ -52,8 +52,12 @@ app.PlanetView = Backbone.View.extend({
     this.configureGlowScene();
     this.setupFilmEffect();
     this.setupProjector();
+
     // get the user's location
-    GEO_LOCATION.getLocation(this.uAreHere, 12000);
+    navigator.geolocation.getCurrentPosition(function(position) {
+      self.uAreHere(position.coords.latitude, position.coords.longitude);
+    });
+
     // setup the camera tween
     this.setupTween();
     // add the scene elements and start rendering
