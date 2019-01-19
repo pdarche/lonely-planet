@@ -17,11 +17,8 @@ from geopy.geocoders import GoogleV3
 
 from config import settings
 
-client = pymongo.MongoClient('localhost', 27017)
-db = client.lonely_planet
-
 CLIENTS = []
-geo = GoogleV3()
+geo = GoogleV3(api_key=settings['google_geocoding_key'])
 
 
 def insert_tweet(status):
@@ -105,7 +102,6 @@ def tweet_callback(status):
             if CLIENTS:
                 status = geocode_status(status)
                 broadcast(status)
-            # insert_tweet(status)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -181,7 +177,6 @@ class PostHandler(tornado.web.RequestHandler,
                 access_token=accessToken,
                 callback=self.async_callback(self._on_post)
             )
-            add_tweet_reply(tweet_id, user_id, tweet['responseText'])
 
         res = json.dumps({"code": 200, "response": "success"})
         self.finish(res)
@@ -202,7 +197,7 @@ if __name__ == "__main__":
         twitter_consumer_key=settings['CONSUMER_KEY'],
         twitter_consumer_secret=settings['CONSUMER_SECRET'],
         cookie_secret=settings['COOKIE_SECRET'],
-        template_path=os.path.join( os.path.dirname( __file__ ), 'templates'),
+        template_path=os.path.join(os.path.dirname(__file__), 'templates'),
         static_path=os.path.join(os.path.dirname(__file__), "static")
     )
     app = tornado.web.Application(
@@ -220,3 +215,5 @@ if __name__ == "__main__":
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(9000)
     stream.run()
+
+
