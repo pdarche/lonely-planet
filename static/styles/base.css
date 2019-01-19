@@ -84,10 +84,10 @@ body {
 	cursor: pointer;
 }
 
-#nav{
+#nav {
 	position:absolute;
 	width: 350px;
-	height:100%;
+	height: 100%;
 	background-color: rgba(255,255,255, .1);
 	display:inline-block;
 	z-index: 200;
@@ -99,16 +99,20 @@ body {
 	margin-right:10px;
 }
 
-.tweet{
+.tweet {
 	background-color: rgba(255,255,255,.4);
 	display: inline-block;
-	margin: 10px 10px 0px 15px;
+	margin: 0px 10px 10px 15px;
+    padding: 10px;
 	position: relative;
-	padding: 10px;
 	width: 300px;
 	opacity: 1;
+    left: 0;
+    -webkit-transform: translateY(0%);
 	-webkit-border-radius: 5px;
-	-webkit-transition: all .5s;
+	-webkit-transition: opacity 300ms linear 220ms,
+        transform 300ms ease-out 0s,
+        margin-top 300ms ease-out 0s; 
 }
 
 .tweet-text img.emojione {
@@ -239,10 +243,10 @@ h1 {
 }
 
 .tweet.hidden-tweet {
-	position: absolute;
-	top: -300px;
-	opacity: 0;
-	-webkit-transition: all 2s;
+    display: block;
+    position: absolute;
+    margin-top: -42%;
+	opacity: .05;
 }
 
 #controls{
