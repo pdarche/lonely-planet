@@ -115,6 +115,10 @@ body {
         margin-top 300ms ease-out 0s; 
 }
 
+.tweet-text {
+  margin: 0px;
+}
+
 .tweet-text img.emojione {
 	height: 16px;
 }
