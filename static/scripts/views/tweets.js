@@ -15,6 +15,7 @@ app.TweetsView = Backbone.View.extend({
     } else {
       this.authenticated = false;
     }
+
     // fetch and cache the tweet template
     $.when($.get('/static/scripts/templates/tweet.handlebars'))
      .done(function(tmpl){
@@ -33,9 +34,10 @@ app.TweetsView = Backbone.View.extend({
       , html = tmpl({"tweet":tweet.toJSON(), "cid": tweet.cid});
 
     if (this.prepend && tweet.get('user').followers_count <= this.followerCount){
-      this.$el.prepend(html).delay(500)
+      this.$el.prepend(html)
+        .delay(100)
         .queue(function(){
-          $(this).find('.tweet').eq(0).removeClass('hidden-tweet');
+          $(this).find('.tweet').removeClass('hidden-tweet');
           $(this).dequeue();
         });
     }
