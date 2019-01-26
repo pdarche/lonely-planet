@@ -41,7 +41,7 @@ $(document).ready(function(){
   // event delegator for inter-view event handling
   vent = _.extend({}, Backbone.Events);
   // socket connection to the server
-  socket = new WebSocket("ws://localhost:9000/socket");
+  socket = new WebSocket("wss://lonelyplanet.darche.pizza/socket");
   // the collection of tweets
   tweetsCollection = new app.TweetsCollection();
   // The main three.js scene
