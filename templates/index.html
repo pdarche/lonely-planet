@@ -8,8 +8,10 @@
 <body>
   <svg></svg>
   <div id="title_group">
-    <h1>Lonely Planet</h1>
-    <h2>connect to twitter to respond to tweets</h2>
+    <div class="heading">
+      <h1>Lonely Planet</h1>
+      <h2>connect to twitter to respond to tweets</h2>
+    </div>
     <div id="buttons">
       <div class="button">
         <a href="/login">Connect</a>
@@ -19,6 +21,7 @@
       </div>
     </div>
   </div>
+
   <script>
     var stars = []
     for (var i = 0; i < 900; i++){
@@ -43,7 +46,6 @@
           .attr("r", function(d){ return d.r } )
           .style("fill", "#fff")
           .style("opacity", function(){ return Math.random() * .5})
-
   </script>
 </body>
 </html>

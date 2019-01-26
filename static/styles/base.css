@@ -117,6 +117,7 @@ body {
 
 .tweet-text {
   margin: 0px;
+  float: left;
 }
 
 .tweet-text img.emojione {
